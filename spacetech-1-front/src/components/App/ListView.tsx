@@ -18,13 +18,13 @@ interface ListViewProps {
 export const ListView: FC<ListViewProps> = () => {
   const [mapMode] = useState(true)
 
-  const ViewMode = (
-    <div className='ViewMode'>
-      <button className='ViewModeBtn outline' onClick={() => {}}>
-        {mapMode ? 'Map View' : 'Grid View'}
-      </button>
-    </div>
-  )
+  // const ViewMode = (
+  //   <div className='ViewMode'>
+  //     <button className='ViewModeBtn outline' onClick={() => {}}>
+  //       {mapMode ? 'Map View' : 'Grid View'}
+  //     </button>
+  //   </div>
+  // )
 
   return (
     <div className='flex flex-column flex-gap AppContainer'>
