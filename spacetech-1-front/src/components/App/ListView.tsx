@@ -43,7 +43,7 @@ export const ListView: FC<ListViewProps> = () => {
           <Map data={[]} />
         </div>
       )}
-      <div className='bottom'></div>
+      {/* <div className='bottom'></div> */}
     </div>
   )
 }
