@@ -98,4 +98,5 @@ other layers to consider:
 ## Other parts of the doc
 
 [Market Research](market_research.md)
+[Lean Canvas](https://www.figma.com/board/0RiVZPeWF1nis2E6L0U9Yf/Lean-Canvas-(Copy)?node-id=0-1&t=jjpDPKq6oRDoeVcQ-1)
 [Solution Research](solution_research.md)
