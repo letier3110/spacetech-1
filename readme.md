@@ -49,6 +49,14 @@ other layers to consider:
 ### 2. weather layer
 ### 3. existing electric grid layer
 
+1. https://data.gov.ua/dataset/af86e5d3-0176-440d-bda4-d537077c0635
+  - Register (list) of economic entities of the state sector of the economy
+2. [Public cadastral map of Ukraine](http://map.land.gov.ua/kadastrova-karta)
+  - not working
+3. Open street map (https://www.openstreetmap.org/#map=10/50.4024/30.5320)
+4. [Geoportal of the administrative and territorial system of Ukraine](http://atu.minregion.gov.ua/)
+  - not working
+
 
 ### 4. frontline distance layer
 
@@ -68,3 +76,26 @@ other layers to consider:
   - OSM, districts
   
 ### 7. forestattion layer
+
+## available datasets
+
+### Energy
+
+| Data type | Comments & help | Tools | Data Sources | Specific products/product identifyer | Links |
+| wind speed and direction | Look at variables like U2M, V2M, U10M, V10M etc. which represent the u and v wind components at 2m and 10m heights respectively | NASA EarthData - NASA GES DISC | MERRA-2 |  | https://disc.gsfc.nasa.gov/datasets?project=MERRA-2 |
+| --- | --- | --- | --- | --- | --- |
+|  |  |  |  | tavg1_2d_slv_Nx (hourly time-averaged single-level Diagnostics) | https://disc.gsfc.nasa.gov/datasets/M2T1NXSLV_5.12.4/summary?keywords=%22MERRA-2%22%20tavg1_2d_slv_Nx |
+|  |  |  |  | inst3_3d_ana_Np (three-dimensional atmospheric data, including wind components) | ?? |
+|  |  |  |  | tavg1_2d_u10m (east-west component of wind speed at 10 meters above ground) |  |
+|  |  |  |  | tavg1_2d_v10m (north-south component of wind speed at 10 meters above ground) |  |
+| landscape data |  | EOSDA - LandViewer |  |  |  |
+|  |  | 30-Meter SRTM Tile Downloader |  | DEM: Aspect_Zak, Contour_DEM_Zak, Curvatu_Zak, DEM_Zakarpattia, plan_curve_Zak, profile_curve_Zak, Slope_Zak | https://dwtkns.com/srtm30m/ |
+| Slope of landscape |  |  |  |  | https://earthexplorer.usgs.gov/ |
+| Solar irradiance data (GHI, DNI, DHI) |  |  | Global solar atlas |  | https://globalsolaratlas.info/download |
+|  |  |  | Global wind atlas |  | https://globalwindatlas.info/en/download/gis-files |
+| Map of the current effective placement of wind turbines (source: OSM) |  |  |  |  | https://download.geofabrik.de/europe/ukraine.html |
+
+## Other parts of the doc
+
+[Market Research](market_research.md)
+[Solution Research](solution_research.md)
