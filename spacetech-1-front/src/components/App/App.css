@@ -1,0 +1,214 @@
+
+.AppContainer {
+  --app-padding-vertical: 0px;
+  --app-padding-horizontal: 0px;
+  width: calc(100vw - var(--app-padding-horizontal) * 2);
+  min-height: calc(100vh - var(--app-padding-vertical) * 2);
+  padding: var(--app-padding-vertical) var(--app-padding-horizontal);
+}
+
+.MobileHeader {
+  display: none;
+}
+
+.Header {
+  background-image: url('../../assets/top.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 200px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.FiltersAndModes {
+  display: flex;
+  gap: 12px;
+}
+
+.ViewMode {
+  font-weight: 600;
+  font-family: var(--font-secondary);
+  display: flex;
+  gap: 12px;
+}
+
+.relative {
+  position: relative;
+}
+
+.flex-gap {
+  gap: 12px;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+.jc-center {
+  justify-content: center;
+}
+
+.jc-between {
+  justify-content: space-between;
+}
+
+.filters {
+  font-family: var(--font-text);
+  text-transform: uppercase;
+}
+
+.CardsWithMap {
+  display: grid;
+  gap: 12px;
+  grid-gap: 12px;
+  grid-template-columns: minmax(0px, 0px) 1fr;
+  max-height: calc(100vh - 32px - 52px - var(--app-padding-vertical) * 2);
+  height: 100vh;
+}
+
+.MapContent {
+  overflow-y: overlay;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.Cards {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+}
+
+.poi-popup button {
+  background-color: #f9f9f9;
+  border-color: var(--primary-color, #646cff);
+  color: var(--primary-color, #646cff);
+}
+
+.ChipsFather {
+  position: relative;
+  max-width: 100%;
+  /* overflow: hidden; */
+}
+
+.ChipsModal {
+  position: absolute;
+  top: 75%;
+  left: 0;
+  z-index: 3;
+
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  min-width: 100px;
+  max-width: 450px;
+}
+
+.filterGroup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+  color: #222222;
+  width: 320px;
+
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.filterValues {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filterValues button {
+  padding: 4px 8px;
+}
+
+.inputWrapper {
+  display: flex;
+}
+
+.MailLink button {
+  font-family: var(--font-secondary);
+  background-color: var(--primary-color, #646cff);
+}
+
+@media (prefers-color-scheme: light) {
+  .bottom {
+    background-image: url('../../assets/bottomBig.png');
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 800px;
+  }
+  .ChipsModal {
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+}
+
+/* media for mobile */
+@media (max-width: 768px) {
+  .Cards {
+    display: flex;
+    flex-direction: column;
+  } 
+  .CardsWithMap {
+    display: grid;
+    flex-direction: column;
+    grid-template-columns: 1fr;
+    height: calc(100vh - 270px);
+    max-height: 100%;
+  }
+  .MapContent {
+    display: none;
+  }
+  .Header {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .MobileHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .MobileHeader .ChipsFather input {
+    width: 92%;
+  }
+
+  .MobileHeader .ViewMode .ViewModeBtn {
+    width: 100%;
+  }
+  .MobileHeader .MailLink button {
+    width: 100%;
+  }
+  @media (prefers-color-scheme: light) {
+    .bottom {
+      /* background-image: url('../../assets/bottom.png'); */
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      height: 400px;
+    }
+  }
+}
