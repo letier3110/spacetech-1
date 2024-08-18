@@ -21,3 +21,24 @@ export interface DataEntry {
   mediaUrl?: string[]
   gmaps?: string
 }
+
+// coordinates: [[[[1, 2], [3, 4]]]]
+// type": "MultiPolygon",
+//         "cadnum": "3211500000:00:018:0022",
+//         "area": "4.6495",
+//         "unit_area": "га",
+//         "address"
+export interface CadastrEntry {
+  // actual data
+  type: string
+  cadnum: string
+  area: string
+  unit_area: string
+  address: string
+  coordinates: Array<Array<Array<Array<number>>>>
+
+  // needed for rendering
+  color?: string
+  originalIndex?: number
+  shortName?: string
+}

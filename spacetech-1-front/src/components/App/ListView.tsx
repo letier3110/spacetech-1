@@ -1,5 +1,5 @@
 import { FC, useState } from 'react'
-import { DataEntry } from '../../lib/interfaces'
+import { CadastrEntry, DataEntry } from '../../lib/interfaces'
 // import places from '../../../public/2.json'
 // import PlaceModeData from '../../../public/mode.json'
 import Card from '../Card/Card'
@@ -14,6 +14,7 @@ import { generateColor } from '../../lib/utils'
 
 interface ListViewProps {
   data: Array<DataEntry>
+  cadastrData: Array<CadastrEntry>
 }
 
 export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
