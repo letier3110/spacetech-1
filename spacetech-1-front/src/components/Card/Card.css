@@ -31,6 +31,11 @@
   padding: 0px;
 }
 
+.CardGhost {
+  background-color: transparent;
+  color: #000000;
+}
+
 .Card:hover {
   cursor: pointer;
   color: #ffffff;
@@ -269,5 +274,9 @@
   .Card {
     min-width: calc(100% - var(--app-padding-horizontal));
     max-width: calc(100% - var(--app-padding-horizontal));
+  }
+  .CardGhost {
+    background-color: transparent;
+    color: #ffffff;
   }
 }

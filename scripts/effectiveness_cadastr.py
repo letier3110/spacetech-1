@@ -43,9 +43,9 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, unit_area="�
         # check if area_sqm >= min_roof_area in json_data array, then multiply by item index
         for i, item in enumerate(json_data):
             # area_sqm slice ',' and convert to float
-            # area = float(area_sqm.replace(',', '.'))
+            area = area_sqm * 10000 if unit_area == 'га' else area_sqm
             roof_area = float(item['min_roof_area'].replace(' м2', ''))
-            if (area_sqm) <= roof_area:
+            if (area) >= roof_area:
                 adjusted_cost = i * incremental_step
 
     # Adjust for orientation and slope

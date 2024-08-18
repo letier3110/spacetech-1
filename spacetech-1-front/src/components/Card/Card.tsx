@@ -8,7 +8,7 @@ import { DataEntry } from '../../lib/interfaces'
 import { generateColor } from '../../lib/utils'
 
 interface CardProps {
-  cardData: DataEntry
+  cardData: Omit<DataEntry, 'coordinates'>
   minEffectiveness?: number
   maxEffectiveness?: number
   index?: number

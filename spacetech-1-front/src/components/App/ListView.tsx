@@ -19,13 +19,13 @@ interface ListViewProps {
 
 export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) => {
   const [mapMode] = useState(true)
-  const [searchLocation] = ('м. Славутич')
+  const [searchLocation] = 'м. Славутич'
   const [lat, setLat] = useState(51.5310101)
   const [lng, setLng] = useState(30.7383043)
   const [zoom, setZoom] = useState(13)
 
   const filteredContent = cardsData.map((card) => {
-    const shortName = card.address.split(searchLocation + ',')[1];
+    const shortName = card.address.split(searchLocation + ',')[1]
     return {
       ...card,
       shortName: shortName && shortName.length > 0 ? shortName : undefined
@@ -33,30 +33,39 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) =>
   })
 
   const sortedContent = filteredContent.sort((a, b) => {
-    if(a.effectiveness && b.effectiveness) {
+    if (a.effectiveness && b.effectiveness) {
       return Number.parseFloat(b.effectiveness ?? '0') - Number.parseFloat(a.effectiveness ?? '0')
     } else {
       return !a.effectiveness ? 1 : !b.effectiveness ? -1 : -1
     }
-  });
+  })
 
-  const onlyWithEffectiveness = ((cardsData as unknown[] as Array<Record<string, string>>).concat(cadastrData as unknown[] as Array<Record<string, string>>))
-  // const onlyWithEffectiveness = cardsData
+  const onlyWithEffectiveness = (cardsData as unknown[] as Array<Record<string, string>>)
+    .concat(cadastrData as unknown[] as Array<Record<string, string>>)
+    // const onlyWithEffectiveness = cardsData
     .filter((x) => x?.effectiveness)
     .map((x) => Number.parseFloat(x.effectiveness ?? '0'))
   const min = Math.min(...onlyWithEffectiveness)
   const max = Math.max(...onlyWithEffectiveness)
 
-  const mappedContent = sortedContent.map(x => {
-    const newColor = generateColor(Number.parseFloat(x.effectiveness ?? '0'), min ?? 0, max ?? 1);
+  const mappedContent = sortedContent.map((x) => {
+    const newColor = generateColor(Number.parseFloat(x.effectiveness ?? '0'), min ?? 0, max ?? 1)
     return {
       ...x,
       color: newColor
     }
   })
 
-  const mappedCadastrData = cadastrData.map(x => {
-    const newColor = generateColor(x.effectiveness ?? 0, min ?? 0, max ?? 1);
+  const sortedCadastrData = cadastrData.sort((a, b) => {
+    if (a.effectiveness && b.effectiveness) {
+      return (b.effectiveness ?? 0) - (a.effectiveness ?? 0)
+    } else {
+      return !a.effectiveness ? 1 : !b.effectiveness ? -1 : -1
+    }
+  })
+
+  const mappedCadastrData = sortedCadastrData.map((x) => {
+    const newColor = generateColor(x.effectiveness ?? 0, min ?? 0, max ?? 1)
     return {
       ...x,
       color: newColor
@@ -73,6 +82,13 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) =>
       {mapMode && (
         <div className='CardsWithMap'>
           <div className='MapContent'>
+            <div>
+              <div className='flex flex-gap'>
+                <div className='Card CardGhost'>
+                  <div className='CardName'>Дахи</div>
+                </div>
+              </div>
+            </div>
             {mappedContent.map((cardData, index) => (
               <Card
                 minEffectiveness={min}
@@ -89,6 +105,39 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) =>
                 }}
               />
             ))}
+            <div>
+              <div className='flex flex-gap'>
+                <div className='Card CardGhost'>
+                  <div className='CardName'>Земельні ділянки</div>
+                </div>
+              </div>
+            </div>
+            {mappedCadastrData.map((cardData, index) => {
+              const longitude = cardData.coordinates[0][0][0]
+              const latitude = cardData.coordinates[0][0][1]
+              return (
+                <Card
+                  minEffectiveness={min}
+                  maxEffectiveness={max}
+                  cardData={{
+                    ...cardData,
+                    effectiveness: cardData.effectiveness ? cardData.effectiveness.toString() : undefined,
+                    longitude: longitude.toString(),
+                    latitude: latitude.toString(),
+                    address: cardData.address ?? 'Не вказано'
+                  }}
+                  index={index + 1 + mappedContent.length}
+                  key={index}
+                  onClick={() => {
+                    if (latitude && longitude) {
+                      setLat(latitude)
+                      setLng(longitude)
+                      setZoom(16)
+                    }
+                  }}
+                />
+              )
+            })}
           </div>
           <Map data={mappedContent} cadastrData={mappedCadastrData} lat={lat} lng={lng} zoom={zoom} />
         </div>

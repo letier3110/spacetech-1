@@ -45,7 +45,7 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
             # area_sqm slice ',' and convert to float
             # area = float(area_sqm.replace(',', '.'))
             roof_area = float(item['min_roof_area'].replace(' м2', ''))
-            if (area_sqm) <= roof_area:
+            if (area_sqm) >= roof_area:
                 adjusted_cost = i * incremental_step
 
     # Adjust for orientation and slope
