@@ -25,6 +25,34 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
     seasonal_factor = np.cos(np.radians(latitude)) * (1 + 0.1 * np.cos(2 * np.pi * (month - 1) / 12))
     irradiance = BASE_IRRADIANCE * seasonal_factor
 
+    # Read json from `../data/configuration/installement_cost.json`
+    # get "name", "total_power", "number_of_panels", "min_roof_area", "warranty_period", "price", "income_per_year", "payback_period"
+    # if area_sqm >= min_roof_area, add cost to formula and adjust effectiveness
+    # if warranty_period < 10, add cost to formula and adjust effectiveness
+    # if price > 10000, add cost to formula and adjust effectiveness
+    # if income_per_year < 1000, add cost to formula and adjust effectiveness
+    # if payback_period > 10, add cost to formula and adjust
+    # if number_of_panels > 10, add cost to formula and adjust
+
+    adjusted_cost = 0
+
+    with open('../data/configuration/installement_cost.json', 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
+        logging.debug(f"Loaded JSON data: {json_data}")
+        if area_sqm >= json_data['min_roof_area']:
+            adjusted_cost += json_data['price']
+        if json_data['warranty_period'] < 10:
+            adjusted_cost += json_data['price']
+        if json_data['price'] > 10000:
+            adjusted_cost += json_data['price']
+        if json_data['income_per_year'] < 1000:
+            adjusted_cost += json_data['price']
+        if json_data['payback_period'] > 10:
+            adjusted_cost += json_data['price']
+        if json_data['number_of_panels'] > 10:
+            adjusted_cost += json_data['price']
+
+
     # Adjust for orientation and slope
     orientation_factor = np.cos(np.radians(area_slope)) * np.cos(np.radians(azimuth - 180))
 
@@ -39,6 +67,8 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
 
     # Normalize effectiveness to a value between 0 and 1 (for example purposes)
     effectiveness = collected_energy / (BASE_IRRADIANCE * area_sqm * PANEL_EFFICIENCY)
+
+    # effectiveness -= adjusted_cost
     
     return max(0, min(1, effectiveness))  # Ensure effectiveness is between 0 and 1
 

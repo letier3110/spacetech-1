@@ -16,9 +16,9 @@ const MiniCard: FC<MiniCardProps> = ({ cardData, index }) => {
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <img src={cardData.mediaUrl[0]} className='MiniCardBg' />}
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <div className='MiniCardBgCover' />}
       {index && (<div className='MiniCardIndex'>{index}</div>)}
-      <div className='MiniCardName'>{cardData.address}</div>
-      <div className='MiniCardContent'>{cardData.area} m<sup>2</sup></div>
-      <div className='MiniCardContent'>{cardData.effectiveness ? `${(cardEffectiveness * 100).toFixed(2)}%` : ''}</div>
+      <div className='MiniCardName'>Адреса: {cardData.address ?? 'Не вказана'}</div>
+      <div className='MiniCardContent'>Площа: {cardData.area} m<sup>2</sup></div>
+      <div className='MiniCardContent'>Ефективність: {cardData.effectiveness ? `${(cardEffectiveness * 100).toFixed(2)}%` : ''}</div>
       {/* <a href={link} className='MiniCardDirections' target='_blank' rel='noreferrer'>
         Directions
       </a> */}

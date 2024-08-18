@@ -121,7 +121,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
             properties: {
               ...card,
               color: card.color,
-              originalIndex: index,
+              originalIndex: index + 1,
               name: card.address,
               description: card.area,
               icon: 'music'
@@ -140,7 +140,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
             properties: {
               ...card,
               color: card.color,
-              originalIndex: index + data.length,
+              originalIndex: index + data.length + 1,
               icon: 'music'
             },
             geometry: polygonGeomentry
@@ -438,6 +438,41 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
           })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .setLngLat(coordinates as any)
+            .setHTML(template)
+            .addTo(map.current)
+        })
+        map.current.on('click', 'cadastr-layer', (e) => {
+          if (!map.current) return
+
+          const coordinates = (e?.features?.[0].properties as unknown as Record<string, string>).coordinates.slice()
+          // will output following: "[[[30.7342045460266,51.5186874437193],[30.7340922566161,51.5183129221725],[30.7340383576991,51.5181340451232],[30.734015899817,51.5180613761213],[30.7340114082406,51.5180446063351],[30.7339934419349,51.5179747321597],[30.7339754756292,51.5179216277147],[30.7339575093235,51.5178489583738],[30.7323944407291,51.5180529912289],[30.7324213901877,51.5181256602443],[30.7324393564934,51.5181843543643],[30.7327268173843,51.5190535774782],[30.7329783456638,51.5190228335353],[30.7331310592621,51.5190060641031],[30.7330726687687,51.5188215999421],[30.7342045460266,51.5186874437193]]]""
+          // get first coordinate
+          const coord = JSON.parse(coordinates)[0][0]
+          
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const plainProperties = e?.features?.[0].properties as any
+
+          // // TODO: get from Minicard
+          const component = MiniCard({
+            cardData: {
+              // originalIndex: 0,
+              area: plainProperties.area,
+              mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
+              effectiveness: plainProperties.effectiveness,
+              address: plainProperties.address,
+              latitude: `${coord[1]}`,
+              longitude: `${coord[0]}`
+            }
+          })
+          const template = renderToString(component)
+
+          if (!template) return
+
+          new mapboxgl.Popup({
+            className: 'poi-popup'
+          })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .setLngLat(coord as any)
             .setHTML(template)
             .addTo(map.current)
         })

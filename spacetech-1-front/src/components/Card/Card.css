@@ -31,9 +31,14 @@
   padding: 0px;
 }
 
-.Card:hover .CardIndex, .Card:hover .CardName {
-  visibility: hidden;
+.Card:hover {
+  cursor: pointer;
+  color: #ffffff;
 }
+
+/* .Card:hover .CardIndex, .Card:hover .CardName {
+  visibility: hidden;
+} */
 
 .Card.CardLiked {
   /* border: 8px solid #ff0000; */
@@ -254,6 +259,9 @@
   .directions:hover {
     background-color: #f9f9f9;
     color: var(--primary-color, #646cff);
+  }
+  .Card:hover {
+    color: #000000;
   }
 }
 
