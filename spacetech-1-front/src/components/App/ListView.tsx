@@ -5,6 +5,7 @@ import { CadastrEntry, DataEntry } from '../../lib/interfaces'
 import Card from '../Card/Card'
 import Map from '../Map/Map'
 import { generateColor } from '../../lib/utils'
+import DonutChart from '../DonutChart/DonutChart'
 
 // interface IFilter {
 //   search: string
@@ -72,13 +73,27 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) =>
     }
   })
 
-  // console.log('mappedContent', mappedContent)
+  const agregatedContent = mappedContent.concat(
+    mappedCadastrData.map((x) => ({
+      ...x,
+      color: '',
+      area: x.unit_area === 'га' ? `${(Number.parseFloat(x.area) * 10000).toFixed(2)}` : `${x.area}`
+    })) as never
+  )
+  const bigAreas = agregatedContent.filter((x) => Number.parseInt(x.area) > 10000)
+  const midAreas = agregatedContent.filter((x) => Number.parseInt(x.area) < 10000 && Number.parseInt(x.area) > 1000)
+  const smallAreas = agregatedContent.filter((x) => Number.parseInt(x.area) < 1000)
+
+  const effectiveAreas = agregatedContent.filter((x) => Number.parseFloat(x.effectiveness ?? '0') > 0.5)
+  const optimalAreas = agregatedContent.filter(
+    (x) => Number.parseFloat(x.effectiveness ?? '0') <= 0.5 && Number.parseFloat(x.effectiveness ?? '0') > 0.2
+  )
+  const notEffectiveAreas = agregatedContent.filter((x) => Number.parseFloat(x.effectiveness ?? '0') <= 0.2)
 
   return (
     <div className='flex flex-column flex-gap AppContainer'>
       <div className='Header'>{/* <div className='flex flex-gap'>{ViewMode}</div> */}</div>
       {/* <div className='MobileHeader'>{ViewMode}</div> */}
-
       {mapMode && (
         <div className='CardsWithMap'>
           <div className='MapContent'>
@@ -142,6 +157,23 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) =>
           <Map data={mappedContent} cadastrData={mappedCadastrData} lat={lat} lng={lng} zoom={zoom} />
         </div>
       )}
+      <div className='DesktopCharts'>
+        <h3>Статистика по громаді</h3>
+        <div className='flex flex-gap charts'>
+          <DonutChart
+            labels={['Дахи', 'Земельні ділянки']}
+            dataValues={[mappedContent.length, mappedCadastrData.length]}
+          />
+          <DonutChart
+            labels={['Великі', 'Середні', 'Малі']}
+            dataValues={[bigAreas.length, midAreas.length, smallAreas.length]}
+          />
+          <DonutChart
+            labels={['Високо-ефективні', 'Оптимальні', 'Не ефективні']}
+            dataValues={[effectiveAreas.length, optimalAreas.length, notEffectiveAreas.length]}
+          />
+        </div>
+      </div>
       {/* <div className='bottom'></div> */}
     </div>
   )
