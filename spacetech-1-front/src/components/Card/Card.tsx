@@ -8,12 +8,13 @@ import { generateGmapsLink } from '../../lib/gmaps'
 interface CardProps {
   cardData: DataEntry
   index?: number
+  onClick?: () => void
 }
 
-const Card: FC<CardProps> = ({ cardData, index }) => {
+const Card: FC<CardProps> = ({ cardData, index, onClick }) => {
   const link = useMemo(() => generateGmapsLink(cardData.address), [cardData.address])
   return (
-    <div className='Card'>
+    <div className='Card' onClick={onClick}>
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <img src={cardData.mediaUrl[0]} className='CardBg' />}
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <div className='CardBgCover' />}
       {index && <div className='CardIndex'>{index}</div>}
@@ -26,6 +27,9 @@ const Card: FC<CardProps> = ({ cardData, index }) => {
                 {tag}
               </div>
             ))} */}
+            <div key={index} className='CardOverlayContentTag'>
+              Area: {cardData.area}
+            </div>
           </div>
           <div className='CardOverlayContentRating'>
             <div className='CardOverlayContentRatingStars'>
