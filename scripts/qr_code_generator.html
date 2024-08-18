@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>QR Code Styling</title>
+    <script type="text/javascript" src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+  </head>
+  <body>
+    <div id="canvas"></div>
+    <script type="text/javascript">
+      const domain = 'https://spacetech-1.netlify.app/'
+      const innerColor = '#3740ca'
+
+      const qrCode = new QRCodeStyling({
+        width: 300,
+        height: 300,
+        type: 'svg',
+        data: domain,
+        image: '',
+        dotsOptions: {
+          color: innerColor,
+          type: 'rounded'
+        },
+        backgroundOptions: {
+          color: '#e9ebee'
+        },
+        imageOptions: {
+          crossOrigin: 'anonymous',
+          margin: 20
+        }
+      })
+
+      qrCode.append(document.getElementById('canvas'))
+      // uncomment to download the qr code
+      // qrCode.download({ name: "qr", extension: "svg" });
+    </script>
+  </body>
+</html>

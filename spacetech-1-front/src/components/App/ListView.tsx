@@ -65,7 +65,7 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
   //   </div>
   // )
 
-  const sortedContent = filteredContent.sort((b, a) => {
+  const sortedContent = filteredContent.sort((a, b) => {
     // if (filters.sort === 'rating') {
     //   return b.medianRating - a.medianRating
     // }
@@ -75,7 +75,7 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
     if(a.effectiveness && b.effectiveness) {
       return Number.parseFloat(b.effectiveness ?? '0') - Number.parseFloat(a.effectiveness ?? '0')
     } else {
-      return !a.effectiveness ? -1 : !b.effectiveness ? 0 : 0
+      return !a.effectiveness ? 1 : !b.effectiveness ? -1 : -1
     }
   });
 
