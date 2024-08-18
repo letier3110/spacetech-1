@@ -60,7 +60,7 @@
   /* text-decoration: underline; */
 }
 
-.CardName, .MiniCardName {
+.CardName {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -69,16 +69,38 @@
   width: max-content;
   text-align: center;
   max-width: 100%;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
   z-index: 1;
 }
 
 .MiniCardName {
-  width: calc(100% - 24px);
-  text-align: center;
   padding: 0px 12px;
+  padding-top: 40px;
+
+  width: max-content;
+  max-width: calc(100% - 20px);
+
+  text-align: center;
+
+  font-family: var(--font-secondary);
+  font-weight: bold;
   font-size: 1rem;
+  z-index: 1;
+}
+
+.MiniCardContent {
+  padding: 12px;
+
+  width: 100%;
+  max-width: calc(100% - 20px);
+
+  text-align: center;
+
+  font-family: var(--font-secondary);
+  font-size: 1rem;
+  font-weight: bold;
+  z-index: 1;
 }
 
 .CardBg, .MiniCardBg {

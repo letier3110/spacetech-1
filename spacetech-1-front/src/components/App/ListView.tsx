@@ -4,6 +4,7 @@ import { DataEntry } from '../../lib/interfaces'
 // import PlaceModeData from '../../../public/mode.json'
 import Card from '../Card/Card'
 import Map from '../Map/Map'
+import { generateColor } from '../../lib/utils'
 
 // interface IFilter {
 //   search: string
@@ -77,11 +78,22 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
       return !a.effectiveness ? -1 : !b.effectiveness ? 0 : 0
     }
   });
+
   const onlyWithEffectiveness = cardsData
     .filter((x) => x?.effectiveness)
     .map((x) => Number.parseFloat(x.effectiveness ?? '0'))
   const min = Math.min(...onlyWithEffectiveness)
   const max = Math.max(...onlyWithEffectiveness)
+
+  const mappedContent = sortedContent.map(x => {
+    const newColor = generateColor(Number.parseFloat(x.effectiveness ?? '0'), min ?? 0, max ?? 1);
+    return {
+      ...x,
+      color: newColor
+    }
+  })
+
+  // console.log('mappedContent', mappedContent)
 
   return (
     <div className='flex flex-column flex-gap AppContainer'>
@@ -91,7 +103,7 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
       {mapMode && (
         <div className='CardsWithMap'>
           <div className='MapContent'>
-            {sortedContent.map((cardData, index) => (
+            {mappedContent.map((cardData, index) => (
               <Card
                 minEffectiveness={min}
                 maxEffectiveness={max}
@@ -108,7 +120,7 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
               />
             ))}
           </div>
-          <Map data={filteredContent} lat={lat} lng={lng} zoom={zoom} />
+          <Map data={mappedContent} lat={lat} lng={lng} zoom={zoom} />
         </div>
       )}
       {/* <div className='bottom'></div> */}

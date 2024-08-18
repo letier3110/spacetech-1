@@ -57,7 +57,6 @@ const initialPoiData: GeoJSON.GeoJSON = {
       properties: {
         name: 'Test',
         description: 'test',
-        color: '#646cff',
         effectiveness: 0.5,
         icon: 'music'
       },
@@ -123,10 +122,10 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             type: 'Feature',
             properties: {
               ...card,
+              color: card.color,
               originalIndex: index,
               name: card.address,
               description: card.area,
-              color: '#646cff',
               icon: 'music'
             },
             geometry: isPolygon && polygonTernary ? polygonGeomentry : dotGeomentry
@@ -171,9 +170,9 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
     if (map.current) {
       map.current.on('load', () => {
         if (!map.current) return
-        const onlyWithEffectiveness = poiData.features.filter((x) => x.properties?.effectiveness)
-        const min = Math.min(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
-        const max = Math.max(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
+        // const onlyWithEffectiveness = poiData.features.filter((x) => x.properties?.effectiveness)
+        // const min = Math.min(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
+        // const max = Math.max(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
           if (!map.current) return
           const colorScheme = event.matches ? 'dark' : 'light'
@@ -197,8 +196,6 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           ...poiData,
           features: poiData.features.filter((x) => x.geometry.type === 'Polygon')
         }
-
-        console.log(points, polygons)
 
         prevData.current = data
         map.current.addSource('pois', {
@@ -234,16 +231,16 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             type: 'circle',
             paint: {
               'circle-radius': 6,
-              // 'circle-color': ['get', 'color']
-              'circle-color': [
-                'interpolate',
-                ['exponential', 0.01],
-                ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
-                min,
-                'hsl(0, 50%, 50%)', // Minimum slope value, color red
-                max,
-                'hsl(120, 50%, 50%)' // Maximum slope value, color green
-              ]
+              'circle-color': ['get', 'color']
+              // 'circle-color': [
+              //   'interpolate',
+              //   ['linear'],
+              //   ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
+              //   min,
+              //   'red', // Minimum slope value, color red
+              //   max,
+              //   'green' // Maximum slope value, color green
+              // ]
             }
           })
         }
@@ -261,15 +258,16 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
               type: 'fill',
               layout: {},
               paint: {
-                'fill-color': [
-                  'interpolate',
-                  ['exponential', 0.01],
-                  ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
-                  min,
-                  'red', // Minimum slope value, color red
-                  max,
-                  'green' // Maximum slope value, color green
-                ],
+                'fill-color': ['get', 'color'],
+                // 'fill-color': [
+                //   'interpolate',
+                //   ['exponential', 0.01],
+                //   ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
+                //   min,
+                //   'red', // Minimum slope value, color red
+                //   max,
+                //   'green' // Maximum slope value, color green
+                // ],
                 'fill-opacity': 0.765
               }
             })
@@ -281,7 +279,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
               layout: {},
               paint: {
                 'line-color': '#000',
-                'line-width': 3
+                'line-width': 1
               }
             })
         }
@@ -357,6 +355,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           if (!map.current) return
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const coordinates = (e?.features?.[0].geometry as any).coordinates.slice()
+          // console.log(coordinates)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const plainProperties = e?.features?.[0].properties as any
 
@@ -366,6 +365,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
               // originalIndex: 0,
               area: plainProperties.area,
               mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
+              effectiveness: plainProperties.effectiveness,
               address: plainProperties.address,
               latitude: coordinates[1],
               longitude: coordinates[0]
@@ -379,6 +379,42 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             className: 'poi-popup'
           })
             .setLngLat(coordinates)
+            .setHTML(template)
+            .addTo(map.current)
+        })
+
+        map.current.on('click', 'polygon-layer', (e) => {
+          if (!map.current) return
+
+          // const coordinates = (e?.features?.[0].properties as any).coordinates.slice()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const plainProperties = e?.features?.[0].properties as any
+          const coordinates = [
+            Number.parseFloat(plainProperties.longitude),
+            Number.parseFloat(plainProperties.latitude)
+          ]
+
+          // // TODO: get from Minicard
+          const component = MiniCard({
+            cardData: {
+              // originalIndex: 0,
+              area: plainProperties.area,
+              mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
+              effectiveness: plainProperties.effectiveness,
+              address: plainProperties.address,
+              latitude: `${coordinates[1]}`,
+              longitude: `${coordinates[0]}`
+            }
+          })
+          const template = renderToString(component)
+
+          if (!template) return
+
+          new mapboxgl.Popup({
+            className: 'poi-popup'
+          })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .setLngLat(coordinates as any)
             .setHTML(template)
             .addTo(map.current)
         })
