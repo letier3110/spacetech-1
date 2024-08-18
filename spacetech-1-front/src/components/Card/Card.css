@@ -21,13 +21,14 @@
 
 .MiniCard {
   min-width: 200px;
-  min-height: 200px;
+  min-height: 220px;
   width: 100%;
   height: 100%;
   max-width: 236px;
   max-height: 236px;
 
-  box-shadow: none;
+  /* l2 */
+  box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.1);
   padding: 0px;
 }
 
@@ -100,7 +101,7 @@
 }
 
 .MiniCardContent {
-  padding: 12px;
+  padding: 0px;
 
   width: 100%;
   max-width: calc(100% - 20px);
@@ -108,8 +109,7 @@
   text-align: center;
 
   font-family: var(--font-secondary);
-  font-size: 1rem;
-  font-weight: bold;
+  font-size: 0.9rem;
   z-index: 1;
 }
 

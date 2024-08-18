@@ -120,6 +120,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
             type: 'Feature',
             properties: {
               ...card,
+              solar_kit: card.solar_kit,
               color: card.color,
               originalIndex: index + 1,
               name: card.address,
@@ -139,6 +140,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
             type: 'Feature',
             properties: {
               ...card,
+              solar_kit: card.solar_kit,
               color: card.color,
               originalIndex: index + data.length + 1,
               icon: 'music'
@@ -386,6 +388,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
           const component = MiniCard({
             cardData: {
               // originalIndex: 0,
+              solar_kit: plainProperties.solar_kit,
               area: plainProperties.area,
               mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
               effectiveness: plainProperties.effectiveness,
@@ -421,6 +424,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
           const component = MiniCard({
             cardData: {
               // originalIndex: 0,
+              solar_kit: plainProperties.solar_kit,
               area: plainProperties.area,
               mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
               effectiveness: plainProperties.effectiveness,
@@ -455,6 +459,7 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
           const component = MiniCard({
             cardData: {
               // originalIndex: 0,
+              solar_kit: plainProperties.solar_kit,
               area: plainProperties.unit_area === 'га' ? `${(Number.parseFloat(plainProperties.area) * 10000).toFixed(2)}` : `${plainProperties.area}`,
               mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
               effectiveness: plainProperties.effectiveness,

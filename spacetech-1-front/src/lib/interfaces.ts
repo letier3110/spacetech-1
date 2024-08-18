@@ -14,6 +14,7 @@ export interface DataEntry {
   coordinates?: Array<Array<CoordObj>>
   color?: string
   shortName?: string
+  solar_kit?: SolarKit
   // coordinates?: Array<CoordItem>
   slope?: string
   effectiveness?: string
@@ -37,9 +38,24 @@ export interface CadastrEntry {
   address: string | null
   coordinates: Array<Array<Array<number>>>
   effectiveness?: number
+  solar_kit?: SolarKit
 
   // needed for rendering
   color?: string
   originalIndex?: number
   shortName?: string
+}
+
+export interface SolarKit {
+  effectiveness_weight: number
+  name: string
+  total_power: string
+  number_of_panels: number
+  min_roof_area: string
+  warranty_period: string
+  price: string
+  income_per_year: string
+  payback_period: string
+  count: number
+  cost: number
 }
