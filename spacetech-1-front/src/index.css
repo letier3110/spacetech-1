@@ -1,4 +1,13 @@
 :root {
+  /* --primary-color: #3a67d7; */
+  /* --primary-color: #646cff; */
+  --primary-color: #5056b0;
+
+  --primary-100: rgb(240, 246, 255);
+
+  --font-main: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-secondary: Pangea Display,Helvetica,Arial,sans-serif;
+  --font-text: Pangea Text,Helvetica,Arial,sans-serif;
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
@@ -15,7 +24,7 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--primary-color, #646cff);
   text-decoration: inherit;
 }
 a:hover {
@@ -28,6 +37,9 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  /* background-image: url('assets/BgReverseSmall.png'); */
+  /* background-color: ; */
+  background-size: 300px;
 }
 
 h1 {
@@ -36,33 +48,187 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
+  background-color: var(--primary-color, #646cff);
   border: 1px solid transparent;
+  color: #ffffff;
+  border-radius: 8px;
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: color background-color border-color 0.25s;
+  outline: none;
 }
+
 button:hover {
-  border-color: #646cff;
+  background-color: rgb(18, 18, 18);
+  /* border-color: rgb(18, 18, 18); */
+  border-color: var(--primary-color, #646cff);
+  color: var(--primary-color, #646cff);
+  /* color: #ffffff; */
 }
 button:focus,
 button:focus-visible {
+  outline: none;
+}
+
+button.outline {
+  background-color: transparent;
+  border: 1px var(--primary-color, #646cff) solid;
+  color: var(--primary-color, #646cff);
+}
+button.outline:hover {
+  color: #ffffff;
+}
+
+button a {
+  color: #ffffff;
+}
+
+button.outline a {
+  color: var(--primary-color, #646cff);
+}
+
+.Chip {
+  background-color: var(--primary-color, #646cff);
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 2px 4px 2px 4px;
+  font-size: 1em;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color background-color border-color 0.25s;
+}
+
+.Chip:hover {
+  background-color: #f9f9f9;
+  border-color: var(--primary-color, #646cff);
+  color: var(--primary-color, #646cff);
+}
+.Chip:hover .ChipClose {
+  color: white;
+}
+
+.Chip:focus,
+.Chip:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.ChipClose {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  
+  background-color: #ff2222;
+  border-radius: 12px;
+}
+
+.ChipClose:hover {
+  background-color: #ff5555;
+  color: white;
+}
+
+.ChipDelete {
+  background-color: white;
+  border: 1px solid #ff2222;
+  color: #ff2222;
+}
+
+.ChipDelete:hover {
+  background-color: #ff2222;
+  color: white;
+  border-color: white;
+}
+
+input {
+  border-radius: 8px;
+  border: 1px solid #dddddd;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  color: #242424;
+  background-color: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color background-color border-color 0.25s;
+}
+
+input:hover {
+  background-color: #242424;
+  border-color: var(--primary-color, #646cff);
+  color: var(--primary-color, #646cff);
+}
+input:focus,
+input:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.input {
+  border-radius: 8px;
+  border: 1px solid #dddddd;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: inherit;
+  cursor: pointer;
+  transition: color background-color border-color 0.25s;
+}
+
+.input:hover {
+  background-color: #242424;
+  border-color: var(--primary-color, #646cff);
+  color: var(--primary-color, #646cff);
+}
+.input:focus,
+.input:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {
   :root {
+    --primary-color: rgb(15, 47, 127);
     color: #213547;
     background-color: #ffffff;
+  }
+  body {
+    /* background-image: url('assets/BgSmall.png'); */
+    background-color: #fff;
+  }
+  button:hover {
+    background-color: #f9f9f9;
+  }
+  button.outline:hover {
+    border-color: var(--primary-color, #646cff);
+    color: var(--primary-color, #646cff);
+  }
+  button.outline a {
+    color: var(--primary-color, #646cff);
   }
   a:hover {
     color: #747bff;
   }
-  button {
+  input:hover {
     background-color: #f9f9f9;
+    border-color: var(--primary-color, #646cff);
+    color: var(--primary-color, #646cff);
+  }
+  .input:hover {
+    background-color: #f9f9f9;
+    border-color: var(--primary-color, #646cff);
+    color: var(--primary-color, #646cff);
   }
 }
