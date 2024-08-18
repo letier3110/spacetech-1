@@ -11,6 +11,8 @@ import logging
 import osmnx as ox
 from osmnx._errors import InsufficientResponseError
 from shapely.geometry import Polygon, MultiPolygon, Point
+from shapely.ops import transform as shapely_transform
+from pyproj import Proj, transform, Transformer
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -84,6 +86,20 @@ def polygon_to_coordinates_list(polygon):
     return formatted_coords
 
 
+def get_area(polygons):
+    area = 0
+    for polygon in polygons:
+        # Define the transformer (from WGS84 to UTM)
+        transformer = Transformer.from_crs("epsg:4326", "epsg:32636", always_xy=True)
+
+        # Project the polygon to the UTM coordinate system
+        projected_polygon = shapely_transform(lambda x, y: transformer.transform(x, y), polygon)
+
+        area += projected_polygon.area
+
+    return area
+
+
 def main():
     # Read data from '../data/rich/1.json'
     with open('../data/rich/1.json', 'r', encoding='utf-8') as f:
@@ -110,6 +126,7 @@ def main():
             if polygons:
                 item['polygons'] = [polygon.wkt for polygon in polygons]
                 item['coordinates'] = [polygon_to_coordinates_list(polygon) for polygon in polygons]
+                item['polygons_area'] = get_area(polygons)
             else:
                 logging.debug("No building polygons found")
         else:
