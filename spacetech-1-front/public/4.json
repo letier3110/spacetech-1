@@ -77,7 +77,20 @@
         "area": "4.6495",
         "unit_area": "га",
         "address": "Київська область, м. Славутич, вулиця Енергетична (Будбаза)",
-        "effectiveness": 0.6233456574014555
+        "effectiveness": 0.7437707333419921,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 89,
+            "cost": 5340000.0
+        }
     },
     {
         "coordinates": [
@@ -205,7 +218,20 @@
         "area": "4.4487",
         "unit_area": "га",
         "address": "Київська область, м. Славутич, вулиця Енергетична (Будбаза)",
-        "effectiveness": 0.623346460809795
+        "effectiveness": 0.7437716919619852,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 85,
+            "cost": 5100000.0
+        }
     },
     {
         "coordinates": [
@@ -297,7 +323,20 @@
         "area": "8.9414",
         "unit_area": "га",
         "address": "Київська область, м. Славутич, вулиця Енергетична (Будбаза)",
-        "effectiveness": 0.62334626952206
+        "effectiveness": 0.7437714637190876,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 171,
+            "cost": 10260000.0
+        }
     },
     {
         "coordinates": [
@@ -885,7 +924,20 @@
         "area": "31.5557",
         "unit_area": "га",
         "address": "Київська область, м. Славутич, вулиця Лісна (Будбаза)",
-        "effectiveness": 0.623343132406301
+        "effectiveness": 0.7437677205392629,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 606,
+            "cost": 36360000.0
+        }
     },
     {
         "coordinates": [
@@ -961,7 +1013,20 @@
         "area": "1.088",
         "unit_area": "га",
         "address": null,
-        "effectiveness": 0.6234702667676217
+        "effectiveness": 0.7439194161771963,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 20,
+            "cost": 1200000.0
+        }
     },
     {
         "coordinates": [
@@ -1025,6 +1090,19 @@
         "area": "3.3569",
         "unit_area": "га",
         "address": "Київська область, м. Славутич, вулиця Енергетична (Будбаза)",
-        "effectiveness": 0.6233711371089339
+        "effectiveness": 0.7438011355121065,
+        "solar_kit": {
+            "effectiveness_weight": 0.24,
+            "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 100 КВТ",
+            "total_power": "100320 Вт",
+            "number_of_panels": 304,
+            "min_roof_area": "520 м2",
+            "warranty_period": "20 років",
+            "price": "$60000",
+            "income_per_year": "~$16000",
+            "payback_period": "~3 років",
+            "count": 64,
+            "cost": 3840000.0
+        }
     }
 ]

@@ -35,18 +35,24 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
     # if number_of_panels > 10, add cost to formula and adjust
 
     adjusted_cost = 0
-    incremental_step = 0.06
+    solar_kit = None
+    incremental_step = 0.0004
 
     with open('../data/configuration/installement_cost.json', 'r', encoding='utf-8') as f:
         json_data = json.load(f)
-        logging.debug(f"Loaded JSON data: {json_data}")
+        logging.debug(f"Loaded JSON data")
         # check if area_sqm >= min_roof_area in json_data array, then multiply by item index
         for i, item in enumerate(json_data):
             # area_sqm slice ',' and convert to float
             # area = float(area_sqm.replace(',', '.'))
             roof_area = float(item['min_roof_area'].replace(' м2', ''))
-            if (area_sqm) >= roof_area:
-                adjusted_cost = i * incremental_step
+            area = area_sqm
+            # logging.debug(f"area_sqm: {area_sqm}, roof_area: {roof_area}, effectiveness_weight: {item['effectiveness_weight']}")
+            if (area) >= roof_area and ((solar_kit is None) or solar_kit['number_of_panels'] < item['number_of_panels']):
+                solar_kit = item
+                solar_kit['count'] = int(area // roof_area)
+                solar_kit['cost'] = float(item['price'].replace('$', '')) * solar_kit['count']
+                adjusted_cost = item['number_of_panels'] * incremental_step
 
     # Adjust for orientation and slope
     orientation_factor = np.cos(np.radians(area_slope)) * np.cos(np.radians(azimuth - 180))
@@ -62,11 +68,11 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
 
     # Normalize effectiveness to a value between 0 and 1 (for example purposes)
     effectiveness = (collected_energy / (BASE_IRRADIANCE * area_sqm * PANEL_EFFICIENCY))
-    effectiveness = effectiveness - effectiveness * (incremental_step * len(json_data)) + (effectiveness * adjusted_cost)
+    effectiveness = effectiveness + (effectiveness * adjusted_cost)
 
     # effectiveness -= adjusted_cost
     
-    return max(0, min(1, effectiveness))  # Ensure effectiveness is between 0 and 1
+    return [max(0, min(1, effectiveness)), solar_kit]  # Ensure effectiveness is between 0 and 1
 
 def main():
     # Read data from '../data/rich/2.json'
@@ -88,8 +94,9 @@ def main():
             
             logging.debug(f"Processing address: {address}, area: {area}, latitude: {latitude}, longitude: {longitude}")
 
-            effectiveness = calculate_solar_effectiveness_v2(latitude, longitude, area)
+            [effectiveness, solar_kit] = calculate_solar_effectiveness_v2(latitude, longitude, area)
             item['effectiveness'] = effectiveness
+            item['solar_kit'] = solar_kit
             logging.debug(f"Calculated effectiveness: {effectiveness} for address: {address}")
         except Exception as e:
             logging.error(f"Error processing item: {item}, error: {e}")
