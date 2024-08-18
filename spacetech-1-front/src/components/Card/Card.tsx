@@ -1,62 +1,37 @@
-import { FC, useMemo } from 'react'
+// import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import './Card.css'
 // import { logEvent } from 'firebase/analytics'
 // import { firebaseAnalytics } from '../../lib/firebase/firebase'
 import { DataEntry } from '../../lib/interfaces'
-import { generateGmapsLink } from '../../lib/gmaps'
+// import { generateGmapsLink } from '../../lib/gmaps'
+import { generateColor } from '../../lib/utils'
 
 interface CardProps {
   cardData: DataEntry
+  minEffectiveness?: number
+  maxEffectiveness?: number
   index?: number
   onClick?: () => void
 }
 
-const Card: FC<CardProps> = ({ cardData, index, onClick }) => {
-  const link = useMemo(() => generateGmapsLink(cardData.address), [cardData.address])
+const Card: FC<CardProps> = ({ cardData, index, minEffectiveness, maxEffectiveness, onClick }) => {
+  // const link = useMemo(() => generateGmapsLink(cardData.address), [cardData.address])
   return (
-    <div className='Card' onClick={onClick}>
+    <div
+      className='Card'
+      style={{
+        backgroundColor: cardData.effectiveness
+          ? generateColor(Number.parseFloat(cardData.effectiveness ?? '0'), minEffectiveness ?? 0, maxEffectiveness ?? 1)
+          : 'xx'
+      }}
+      onClick={onClick}
+    >
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <img src={cardData.mediaUrl[0]} className='CardBg' />}
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <div className='CardBgCover' />}
       {index && <div className='CardIndex'>{index}</div>}
-      <div className='CardName'>{cardData.address}</div>
-      <div className='CardOverlay'>
-        <div className='CardOverlayContent'>
-          <div className='CardOverlayContentTags flex flex-gap flex-wrap'>
-            {/* {cardData.tags.map((tag, index) => (
-              <div key={index} className='CardOverlayContentTag'>
-                {tag}
-              </div>
-            ))} */}
-            <div key={index} className='CardOverlayContentTag'>
-              Area: {cardData.area}
-            </div>
-          </div>
-          <div className='CardOverlayContentRating'>
-            <div className='CardOverlayContentRatingStars'>
-              {/* <div
-                className='CardOverlayContentRatingStarsFilled'
-                style={{ width: `${(cardData.medianRating / 10) * 100}%` }}
-              />
-
-              <div className='CardOverlayContentRatingStarsEmpty' /> */}
-            </div>
-          </div>
-          <div className='CardOverlayContentInfo'>
-            {/* {cardData.numberOfRatings}
-
-            <span>ratings</span>
-
-            <span>•</span>
-
-            {cardData.medianRating}
-
-            <span>stars</span> */}
-          </div>
-          <a href={link} className='directions' target='_blank' rel='noreferrer'>
-            Directions
-          </a>
-        </div>
-      </div>
+      <div className='CardName'>{cardData.shortName ?? cardData.address}</div>
+      
     </div>
   )
 }

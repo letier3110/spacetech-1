@@ -12,6 +12,7 @@ export interface DataEntry {
   latitude: string
   longitude: string
   coordinates?: Array<Array<CoordObj>>
+  shortName?: string
   // coordinates?: Array<CoordItem>
   slope?: string
   effectiveness?: string

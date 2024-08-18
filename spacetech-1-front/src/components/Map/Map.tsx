@@ -8,7 +8,7 @@ import MiniCard from './MiniCard'
 
 mapboxgl.accessToken = (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string) || ''
 
-const polygonTernary = false
+const polygonTernary = true
 
 const showPoiText = true
 const showPoi = true
@@ -34,17 +34,19 @@ const MapWrapper: FC<MapProps> = ({ data, lat, lng, zoom }) => {
 }
 
 const buildingCoordinates = [
-  [51.52252001, 30.7603801],
-  [51.52257001, 30.7599201],
-  [51.52260001, 30.7599301],
-  [51.52271001, 30.7599601],
-  [51.52274001, 30.7599801],
-  [51.52273001, 30.7600801],
-  [51.52279001, 30.7601001],
-  [51.52277001, 30.7602701],
-  [51.52271001, 30.7602501],
-  [51.52269001, 30.7604301],
-  [51.52252001, 30.7603801]
+  [
+    [30.76038, 51.52252],
+    [30.75992, 51.52257],
+    [30.75993, 51.5226],
+    [30.75996, 51.52271],
+    [30.75998, 51.52274],
+    [30.76008, 51.52273],
+    [30.7601, 51.52279],
+    [30.76027, 51.52277],
+    [30.76025, 51.52271],
+    [30.76043, 51.52269],
+    [30.76038, 51.52252]
+  ]
 ]
 
 const initialPoiData: GeoJSON.GeoJSON = {
@@ -53,14 +55,15 @@ const initialPoiData: GeoJSON.GeoJSON = {
     {
       type: 'Feature',
       properties: {
-        name: 'Building',
-        description: 'Building',
+        name: 'Test',
+        description: 'test',
         color: '#646cff',
+        effectiveness: 0.5,
         icon: 'music'
       },
       geometry: {
         type: 'Polygon',
-        coordinates: [buildingCoordinates]
+        coordinates: buildingCoordinates
       }
     }
   ]
@@ -94,9 +97,8 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
   const poiData: GeoJSON.GeoJSON = useMemo(() => {
     return {
       type: 'FeatureCollection',
-      features: initialPoiData.features
-      .concat(
-        data.map<GeoJSON.Feature>((card) => {
+      features: initialPoiData.features.concat(
+        data.map<GeoJSON.Feature>((card, index) => {
           // const isPolygon = card.coordinates && card.coordinates.length > 2
           const isPolygon = card.coordinates && card.coordinates.length > 0
           const dotGeomentry = {
@@ -105,11 +107,14 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           }
           const polygonCoords = (card.coordinates ?? [[]]).map((x) => {
             const coords = x.map((y) => {
-              const coord = [Number.parseFloat(y.lt), Number.parseFloat(y.lg)]
+              const coord = [Number.parseFloat(y.lg), Number.parseFloat(y.lt)]
+              // console.log(coord)
               return coord
             })
+            // console.log(coords)
             return coords
           })
+          // console.log(JSON.stringify(polygonCoords))
           const polygonGeomentry = {
             type: 'Polygon' as GeoJSON.Polygon['type'],
             coordinates: polygonCoords
@@ -118,6 +123,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             type: 'Feature',
             properties: {
               ...card,
+              originalIndex: index,
               name: card.address,
               description: card.area,
               color: '#646cff',
@@ -165,6 +171,9 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
     if (map.current) {
       map.current.on('load', () => {
         if (!map.current) return
+        const onlyWithEffectiveness = poiData.features.filter((x) => x.properties?.effectiveness)
+        const min = Math.min(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
+        const max = Math.max(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
           if (!map.current) return
           const colorScheme = event.matches ? 'dark' : 'light'
@@ -207,7 +216,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             source: 'pois',
             type: 'symbol',
             layout: {
-              'text-field': ['get', 'description'],
+              'text-field': ['get', 'originalIndex'],
               'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
               'text-radial-offset': 0.5,
               'text-justify': 'auto'
@@ -225,38 +234,56 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             type: 'circle',
             paint: {
               'circle-radius': 6,
-              'circle-color': ['get', 'color']
+              // 'circle-color': ['get', 'color']
+              'circle-color': [
+                'interpolate',
+                ['exponential', 0.01],
+                ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
+                min,
+                'hsl(0, 50%, 50%)', // Minimum slope value, color red
+                max,
+                'hsl(120, 50%, 50%)' // Maximum slope value, color green
+              ]
             }
           })
         }
 
         if (!showPolygonExtrusion && showPolygon) {
-          map.current.addLayer({
-            id: 'polygon-layer',
-            source: 'pss',
-            // type: 'circle',
-            // paint: {
-            //   'circle-radius': 6,
-            //   'circle-color': ['get', 'color']
-            // }
-            type: 'fill',
-            'layout': {},
-            paint: {
-              'fill-color': ['get', 'color'],
-              'fill-opacity': 0.8
-            }
-          })
-          // Add a black outline around the polygon.
-          .addLayer({
-              'id': 'polygon-outline',
-              'type': 'line',
-              'source': 'pss',
-              'layout': {},
-              'paint': {
-                  'line-color': '#000',
-                  'line-width': 3
+          map.current
+            .addLayer({
+              id: 'polygon-layer',
+              source: 'pss',
+              // type: 'circle',
+              // paint: {
+              //   'circle-radius': 6,
+              //   'circle-color': ['get', 'color']
+              // }
+              type: 'fill',
+              layout: {},
+              paint: {
+                'fill-color': [
+                  'interpolate',
+                  ['exponential', 0.01],
+                  ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
+                  min,
+                  'red', // Minimum slope value, color red
+                  max,
+                  'green' // Maximum slope value, color green
+                ],
+                'fill-opacity': 0.765
               }
-          });
+            })
+            // Add a black outline around the polygon.
+            .addLayer({
+              id: 'polygon-outline',
+              type: 'line',
+              source: 'pss',
+              layout: {},
+              paint: {
+                'line-color': '#000',
+                'line-width': 3
+              }
+            })
         }
 
         if (!showPolygon && showPolygonExtrusion) {
@@ -284,7 +311,7 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             source: 'pss',
             type: 'symbol',
             layout: {
-              'text-field': ['get', 'description'],
+              'text-field': ['get', 'originalIndex'],
               'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
               'text-radial-offset': 0.5,
               'text-justify': 'auto'

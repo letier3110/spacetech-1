@@ -17,18 +17,25 @@ interface ListViewProps {
 
 export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
   const [mapMode] = useState(true)
+  const [searchLocation] = ('м. Славутич')
   const [lat, setLat] = useState(51.5310101)
   const [lng, setLng] = useState(30.7383043)
   const [zoom, setZoom] = useState(13)
 
-  const filteredContent = cardsData
-    // .filter((card) => currentMode?.value.every((tag) => card.tags.includes(tag)))
-    // .filter((card) => {
-    //   if (filters.tags.length > 0) {
-    //     return filters.tags.every((tag) => card.tags.includes(tag))
-    //   }
-    //   return true
-    // })
+  const filteredContent = cardsData.map((card) => {
+    const shortName = card.address.split(searchLocation + ',')[1];
+    return {
+      ...card,
+      shortName: shortName && shortName.length > 0 ? shortName : undefined
+    }
+  })
+  // .filter((card) => currentMode?.value.every((tag) => card.tags.includes(tag)))
+  // .filter((card) => {
+  //   if (filters.tags.length > 0) {
+  //     return filters.tags.every((tag) => card.tags.includes(tag))
+  //   }
+  //   return true
+  // })
 
   // const maxTagItems = 3
   // const unlimitedFilters = tagGroups
@@ -57,6 +64,25 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
   //   </div>
   // )
 
+  const sortedContent = filteredContent.sort((b, a) => {
+    // if (filters.sort === 'rating') {
+    //   return b.medianRating - a.medianRating
+    // }
+    // if (filters.sort === 'popularity') {
+    //   return b.numberOfRatings - a.numberOfRatings
+    // }
+    if(a.effectiveness && b.effectiveness) {
+      return Number.parseFloat(b.effectiveness ?? '0') - Number.parseFloat(a.effectiveness ?? '0')
+    } else {
+      return !a.effectiveness ? -1 : !b.effectiveness ? 0 : 0
+    }
+  });
+  const onlyWithEffectiveness = cardsData
+    .filter((x) => x?.effectiveness)
+    .map((x) => Number.parseFloat(x.effectiveness ?? '0'))
+  const min = Math.min(...onlyWithEffectiveness)
+  const max = Math.max(...onlyWithEffectiveness)
+
   return (
     <div className='flex flex-column flex-gap AppContainer'>
       <div className='Header'>{/* <div className='flex flex-gap'>{ViewMode}</div> */}</div>
@@ -65,14 +91,21 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
       {mapMode && (
         <div className='CardsWithMap'>
           <div className='MapContent'>
-            {filteredContent.map((cardData, index) => (
-              <Card cardData={cardData} index={index + 1} key={index} onClick={() => {
-                if(cardData.latitude && cardData.longitude && cardData.latitude !== 'Not found') {
-                  setLat(Number.parseFloat(cardData.latitude))
-                  setLng(Number.parseFloat(cardData.longitude))
-                  setZoom(16)
-                }
-              }} />
+            {sortedContent.map((cardData, index) => (
+              <Card
+                minEffectiveness={min}
+                maxEffectiveness={max}
+                cardData={cardData}
+                index={index + 1}
+                key={index}
+                onClick={() => {
+                  if (cardData.latitude && cardData.longitude && cardData.latitude !== 'Not found') {
+                    setLat(Number.parseFloat(cardData.latitude))
+                    setLng(Number.parseFloat(cardData.longitude))
+                    setZoom(16)
+                  }
+                }}
+              />
             ))}
           </div>
           <Map data={filteredContent} lat={lat} lng={lng} zoom={zoom} />
