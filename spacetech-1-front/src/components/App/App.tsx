@@ -1,14 +1,13 @@
 import { FC } from 'react'
-// import CardsData from '../../../public/data.json'
-// import { DataEntry } from '../../lib/interfaces'
+import PlacesData from '../../../public/2.json'
+import { DataEntry } from '../../lib/interfaces'
 import './App.css'
 import { ListView } from './ListView'
 
-// const data = CardsData as { data: Array<DataEntry> }
-// const cardsData = data.data
+const data = PlacesData as Array<DataEntry>
 
 const App: FC = () => {
-  return <ListView data={[]} />
+  return <ListView data={data} />
 }
 
 export default App

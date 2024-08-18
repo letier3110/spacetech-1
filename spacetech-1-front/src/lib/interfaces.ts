@@ -1,27 +1,12 @@
 export interface DataEntry {
-  name: string
-  detailed?: string
-  coordinates: {
-    latitude: number
-    longitude: number
-  }
+  originalIndex?: number
   address: string
-  hours: {
-    open: string
-    close: string
-  }[]
-  gmaps: string
-  menu: {
-    name: string
-    price: number
-  }[]
-  mediaUrl: string[]
-  reviews: {
-    name: string
-    rating: number
-    comment: string
-  }[]
-  tags: string[]
-  medianRating: number
-  numberOfRatings: number
+  area: string
+  latitude: string
+  longitude: string
+  slope?: string
+  effectiveness?: string
+  // remove this, legacy
+  mediaUrl?: string[]
+  gmaps?: string
 }

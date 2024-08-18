@@ -1,10 +1,10 @@
 import mapboxgl from 'mapbox-gl'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
-// import { renderToString } from 'react-dom/server'
+import { renderToString } from 'react-dom/server'
 import ErrorBoundary from '../App/ErrorBoundary'
 import { DataEntry } from '../../lib/interfaces'
 import './mapbox.css'
-// import MiniCard from './MiniCard'
+import MiniCard from './MiniCard'
 
 mapboxgl.accessToken = (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string) || ''
 
@@ -52,9 +52,9 @@ const Map: FC<MapProps> = ({ data }) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const prevData = useRef<Array<DataEntry>>([])
-  const [lat] = useState(49.3210693)
-  const [lng] = useState(31.7759313)
-  const [zoom] = useState(7)
+  const [lat] = useState(51.5310101)
+  const [lng] = useState(30.7383043)
+  const [zoom] = useState(13)
 
   const [mode, setMode] = useState<string>(
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -75,14 +75,14 @@ const Map: FC<MapProps> = ({ data }) => {
           type: 'Feature',
           properties: {
             ...card,
-            name: card.name,
-            description: card.name,
+            name: card.address,
+            description: card.area,
             color: '#646cff',
             icon: 'music'
           },
           geometry: {
             type: 'Point',
-            coordinates: [card.coordinates.longitude, card.coordinates.latitude]
+            coordinates: [Number.parseFloat(card.longitude), Number.parseFloat(card.latitude)]
           }
         }))
       )
@@ -232,40 +232,34 @@ const Map: FC<MapProps> = ({ data }) => {
         // })
 
         // Add click event for POIs
-        map.current.on('click', 'poi-layer', () => {
+        map.current.on('click', 'poi-layer', (e) => {
           if (!map.current) return
-          // const coordinates = e.features[0].geometry.coordinates.slice()
-          // const plainProperties = e.features[0].properties
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const coordinates = (e?.features?.[0].geometry as any).coordinates.slice()
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const plainProperties = (e?.features?.[0].properties as any)
 
           // // TODO: get from Minicard
-          // const component = MiniCard({
-          //   cardData: {
-          //     name: plainProperties.name,
-          //     mediaUrl: JSON.parse(plainProperties.mediaUrl),
-          //     tags: JSON.parse(plainProperties.tags),
-          //     medianRating: plainProperties.medianRating,
-          //     numberOfRatings: plainProperties.numberOfRatings,
-          //     address: plainProperties.address,
-          //     menu: JSON.parse(plainProperties.menu),
-          //     hours: JSON.parse(plainProperties.menu),
-          //     reviews: JSON.parse(plainProperties.reviews),
-          //     gmaps: plainProperties.gmaps,
-          //     coordinates: {
-          //       latitude: coordinates[1],
-          //       longitude: coordinates[0]
-          //     }
-          //   }
-          // })
-          // const template = renderToString(component)
+          const component = MiniCard({
+            cardData: {
+              // originalIndex: 0,
+              area: plainProperties.area,
+              mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
+              address: plainProperties.address,
+              latitude: coordinates[1],
+              longitude: coordinates[0]
+            }
+          })
+          const template = renderToString(component)
 
-          // if (!template) return
+          if (!template) return
 
-          // new mapboxgl.Popup({
-          //   className: 'poi-popup'
-          // })
-          //   .setLngLat(coordinates)
-          //   .setHTML(template)
-          //   .addTo(map.current)
+          new mapboxgl.Popup({
+            className: 'poi-popup'
+          })
+            .setLngLat(coordinates)
+            .setHTML(template)
+            .addTo(map.current)
         })
 
         // Change cursor on POI hover
@@ -279,6 +273,7 @@ const Map: FC<MapProps> = ({ data }) => {
         })
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poiData])
 
   return <div ref={mapContainer} id='map' style={{ width: '100%', height: '100%' }}></div>
