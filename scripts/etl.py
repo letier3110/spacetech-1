@@ -1,4 +1,4 @@
-# read data from './raw/1.ini' and write to './rich/1.json'
+# read data from '../data/raw/1.ini' and write to '../data/rich/1.json'
 # data is like this: 
 # 1. find line that starts with 'м.Славутич, '
 # 2. extract that line (=address) and line below it (=area)
@@ -36,8 +36,8 @@ def write_data(data, file_path):
 
 def main():
     logging.debug("Starting ETL process")
-    data = extract_data('./raw/1.ini')
-    write_data(data, './rich/1.json')
+    data = extract_data('../data/raw/1.ini')
+    write_data(data, '../data/rich/1.json')
     logging.debug("ETL process completed")
 
 if __name__ == "__main__":

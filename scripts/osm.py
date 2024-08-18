@@ -1,4 +1,4 @@
-# read data from './rich/1.json' and write to './rich/2.json'
+# read data from '../data/rich/1.json' and write to '../data/rich/2.json'
 # data is like this: 
 # 1. inside json extract array of objects with address and area
 # 2. query openstreetmap for latitude and longitude of each address
@@ -35,8 +35,8 @@ def get_lat_long(address):
         return None, None
 
 def main():
-    # Read data from './rich/1.json'
-    with open('./rich/1.json', 'r', encoding='utf-8') as f:
+    # Read data from '../data/rich/1.json'
+    with open('../data/rich/1.json', 'r', encoding='utf-8') as f:
         json_data = json.load(f)
         logging.debug(f"Loaded JSON data: {json_data}")
 
@@ -60,10 +60,10 @@ def main():
             item['longitude'] = 'Not found'
         logging.debug(f"Updated item: {item}")
 
-    # Write the updated JSON data to './rich/2.json'
-    with open('./rich/2.json', 'w', encoding='utf-8') as f:
+    # Write the updated JSON data to '../data/rich/2.json'
+    with open('../data/rich/2.json', 'w', encoding='utf-8') as f:
         json.dump(json_data, f, ensure_ascii=False, indent=4)
-        logging.debug(f"Written updated JSON data to './rich/2.json'")
+        logging.debug(f"Written updated JSON data to '../data/rich/2.json'")
 
 if __name__ == "__main__":
     main()
