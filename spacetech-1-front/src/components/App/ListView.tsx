@@ -17,6 +17,9 @@ interface ListViewProps {
 
 export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
   const [mapMode] = useState(true)
+  const [lat, setLat] = useState(51.5310101)
+  const [lng, setLng] = useState(30.7383043)
+  const [zoom, setZoom] = useState(13)
 
   const filteredContent = cardsData
     // .filter((card) => currentMode?.value.every((tag) => card.tags.includes(tag)))
@@ -63,10 +66,16 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
         <div className='CardsWithMap'>
           <div className='MapContent'>
             {filteredContent.map((cardData, index) => (
-              <Card cardData={cardData} index={index + 1} key={index} />
+              <Card cardData={cardData} index={index + 1} key={index} onClick={() => {
+                if(cardData.latitude && cardData.longitude && cardData.latitude !== 'Not found') {
+                  setLat(Number.parseFloat(cardData.latitude))
+                  setLng(Number.parseFloat(cardData.longitude))
+                  setZoom(16)
+                }
+              }} />
             ))}
           </div>
-          <Map data={filteredContent} />
+          <Map data={filteredContent} lat={lat} lng={lng} zoom={zoom} />
         </div>
       )}
       {/* <div className='bottom'></div> */}

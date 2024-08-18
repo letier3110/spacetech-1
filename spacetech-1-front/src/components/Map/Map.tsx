@@ -8,53 +8,68 @@ import MiniCard from './MiniCard'
 
 mapboxgl.accessToken = (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string) || ''
 
+const polygonTernary = false
+
+const showPoiText = true
+const showPoi = true
+const showPolygonText = true
+const showPolygon = true
+const showPolygonExtrusion = false
+
 interface MapProps {
   data: Array<DataEntry>
+  lat: number
+  lng: number
+  zoom: number
 }
 
-const MapWrapper: FC<MapProps> = ({ data }) => {
+const MapWrapper: FC<MapProps> = ({ data, lat, lng, zoom }) => {
   return (
     <div className='map-wrapper'>
       <ErrorBoundary fallback={'Cant Load Maps'}>
-        <Map data={data} />
+        <Map data={data} lat={lat} lng={lng} zoom={zoom} />
       </ErrorBoundary>
     </div>
   )
 }
 
-interface MapFeature {
-  type: string
-  properties: Record<string, string | number | object>
-  geometry: {
-    type: string
-    coordinates: [number, number]
-  }
-}
+const buildingCoordinates = [
+  [51.52252001, 30.7603801],
+  [51.52257001, 30.7599201],
+  [51.52260001, 30.7599301],
+  [51.52271001, 30.7599601],
+  [51.52274001, 30.7599801],
+  [51.52273001, 30.7600801],
+  [51.52279001, 30.7601001],
+  [51.52277001, 30.7602701],
+  [51.52271001, 30.7602501],
+  [51.52269001, 30.7604301],
+  [51.52252001, 30.7603801]
+]
 
-const initialPoiData = {
+const initialPoiData: GeoJSON.GeoJSON = {
   type: 'FeatureCollection',
   features: [
-    // {
-    //   type: 'Feature',
-    //   properties: {
-    //     name: 'Clérigos Tower',
-    //     color: '#AC9733'
-    //   },
-    //   geometry: {
-    //     type: 'Point',
-    //     coordinates: [-8.6143, 41.1457]
-    //   }
-    // },
-  ] as Array<MapFeature>
+    {
+      type: 'Feature',
+      properties: {
+        name: 'Building',
+        description: 'Building',
+        color: '#646cff',
+        icon: 'music'
+      },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [buildingCoordinates]
+      }
+    }
+  ]
 }
 
-const Map: FC<MapProps> = ({ data }) => {
+const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const prevData = useRef<Array<DataEntry>>([])
-  const [lat] = useState(51.5310101)
-  const [lng] = useState(30.7383043)
-  const [zoom] = useState(13)
 
   const [mode, setMode] = useState<string>(
     window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
@@ -67,24 +82,51 @@ const Map: FC<MapProps> = ({ data }) => {
     })
   }, [])
 
-  const poiData = useMemo(() => {
+  useEffect(() => {
+    if (map.current) {
+      map.current.flyTo({
+        center: [lng, lat],
+        zoom: zoom
+      })
+    }
+  }, [lat, lng, zoom])
+
+  const poiData: GeoJSON.GeoJSON = useMemo(() => {
     return {
-      ...initialPoiData,
-      features: initialPoiData.features.concat(
-        data.map<MapFeature>((card) => ({
-          type: 'Feature',
-          properties: {
-            ...card,
-            name: card.address,
-            description: card.area,
-            color: '#646cff',
-            icon: 'music'
-          },
-          geometry: {
-            type: 'Point',
+      type: 'FeatureCollection',
+      features: initialPoiData.features
+      .concat(
+        data.map<GeoJSON.Feature>((card) => {
+          // const isPolygon = card.coordinates && card.coordinates.length > 2
+          const isPolygon = card.coordinates && card.coordinates.length > 0
+          const dotGeomentry = {
+            type: 'Point' as GeoJSON.Point['type'],
             coordinates: [Number.parseFloat(card.longitude), Number.parseFloat(card.latitude)]
           }
-        }))
+          const polygonCoords = (card.coordinates ?? [[]]).map((x) => {
+            const coords = x.map((y) => {
+              const coord = [Number.parseFloat(y.lt), Number.parseFloat(y.lg)]
+              return coord
+            })
+            return coords
+          })
+          const polygonGeomentry = {
+            type: 'Polygon' as GeoJSON.Polygon['type'],
+            coordinates: polygonCoords
+          }
+          return {
+            type: 'Feature',
+            properties: {
+              ...card,
+              name: card.address,
+              description: card.area,
+              color: '#646cff',
+              icon: 'music'
+            },
+            geometry: isPolygon && polygonTernary ? polygonGeomentry : dotGeomentry
+            // geometry: dotGeomentry
+          }
+        })
       )
     }
   }, [data])
@@ -94,31 +136,13 @@ const Map: FC<MapProps> = ({ data }) => {
       if (prevData.current.every((card, index) => card === data[index]) && prevData.current.length === data.length) {
         return
       }
-      if (map.current.getSource('poi-source') && map.current.getLayer('poi-layer')) {
-        prevData.current = data
-        map.current.removeLayer('poi-layer')
-        map.current.removeSource('poi-source')
-        map.current.addSource('poi-source', {
-          type: 'geojson',
-          data: poiData as GeoJSON.GeoJSON
-        })
-        map.current.addLayer({
-          id: 'poi-layer',
-          source: 'poi-source',
-          type: 'circle',
-          paint: {
-            'circle-radius': 6,
-            'circle-color': ['get', 'color']
-          }
-
-          // type: 'fill-extrusion',
-          // paint: {
-          //   'fill-extrusion-color': ['get', 'color'],
-          //   'fill-extrusion-height': ['get', 'height'],
-          //   'fill-extrusion-base': 0,
-          //   'fill-extrusion-opacity': 0.8
-          // }
-        })
+      if (
+        map.current.getSource('poi-source') &&
+        map.current.getLayer('poi-layer') &&
+        map.current.getSource('polygon-source') &&
+        map.current.getLayer('polygon-layer')
+      ) {
+        // old code to re-render on appearance change
         return
       }
       return
@@ -156,50 +180,120 @@ const Map: FC<MapProps> = ({ data }) => {
             trackUserLocation: true
           })
         )
+        const points = {
+          ...poiData,
+          features: poiData.features.filter((x) => x.geometry.type === 'Point')
+        }
+        const polygons = {
+          ...poiData,
+          features: poiData.features.filter((x) => x.geometry.type === 'Polygon')
+        }
+
+        console.log(points, polygons)
+
         prevData.current = data
-        map.current.addSource('poi-source', {
+        map.current.addSource('pois', {
           type: 'geojson',
-          data: poiData as GeoJSON.GeoJSON
+          data: points
+        })
+        map.current.addSource('pss', {
+          type: 'geojson',
+          data: polygons
         })
 
-        // map.current.addLayer({
-        //   id: '3d-buildings',
-        //   source: 'composite',
-        //   'source-layer': 'building',
-        //   filter: ['==', 'extrude', 'true'],
-        //   type: 'fill-extrusion',
-        //   minzoom: 15,
-        //   paint: {
-        //     'fill-extrusion-color': '#aaa',
-        //     'fill-extrusion-height': ['interpolate', ['linear'], ['zoom'], 15, 0, 15.05, ['get', 'height']],
-        //     'fill-extrusion-base': ['interpolate', ['linear'], ['zoom'], 15, 0, 15.05, ['get', 'min_height']],
-        //     'fill-extrusion-opacity': 0.6
-        //   }
-        // })
-        map.current.addLayer({
-          id: 'poi-layer-text',
-          source: 'poi-source',
-          type: 'symbol',
-          layout: {
-            'text-field': ['get', 'description'],
-            'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
-            'text-radial-offset': 0.5,
-            'text-justify': 'auto'
-          },
-          paint: {
-            'text-color': mode === 'dark' ? '#fff' : '#000'
-          }
-        })
+        if (showPoiText) {
+          map.current.addLayer({
+            id: 'poi-layer-text',
+            source: 'pois',
+            type: 'symbol',
+            layout: {
+              'text-field': ['get', 'description'],
+              'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+              'text-radial-offset': 0.5,
+              'text-justify': 'auto'
+            },
+            paint: {
+              'text-color': mode === 'dark' ? '#fff' : '#000'
+            }
+          })
+        }
 
-        map.current.addLayer({
-          id: 'poi-layer',
-          source: 'poi-source',
-          type: 'circle',
-          paint: {
-            'circle-radius': 6,
-            'circle-color': ['get', 'color']
-          }
-        })
+        if (showPoi) {
+          map.current.addLayer({
+            id: 'poi-layer',
+            source: 'pois',
+            type: 'circle',
+            paint: {
+              'circle-radius': 6,
+              'circle-color': ['get', 'color']
+            }
+          })
+        }
+
+        if (!showPolygonExtrusion && showPolygon) {
+          map.current.addLayer({
+            id: 'polygon-layer',
+            source: 'pss',
+            // type: 'circle',
+            // paint: {
+            //   'circle-radius': 6,
+            //   'circle-color': ['get', 'color']
+            // }
+            type: 'fill',
+            'layout': {},
+            paint: {
+              'fill-color': ['get', 'color'],
+              'fill-opacity': 0.8
+            }
+          })
+          // Add a black outline around the polygon.
+          .addLayer({
+              'id': 'polygon-outline',
+              'type': 'line',
+              'source': 'pss',
+              'layout': {},
+              'paint': {
+                  'line-color': '#000',
+                  'line-width': 3
+              }
+          });
+        }
+
+        if (!showPolygon && showPolygonExtrusion) {
+          map.current.addLayer({
+            id: 'polygon-layer',
+            source: 'pss',
+            type: 'fill-extrusion',
+            paint: {
+              'fill-extrusion-color': ['get', 'color'],
+
+              // Get `fill-extrusion-height` from the source `height` property.
+              'fill-extrusion-height': 1,
+
+              // Get `fill-extrusion-base` from the source `base_height` property.
+              'fill-extrusion-base': 1,
+
+              // Make extrusions slightly opaque to see through indoor walls.
+              'fill-extrusion-opacity': 0.5
+            }
+          })
+        }
+        if (showPolygonText) {
+          map.current.addLayer({
+            id: 'polygon-layer-text',
+            source: 'pss',
+            type: 'symbol',
+            layout: {
+              'text-field': ['get', 'description'],
+              'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+              'text-radial-offset': 0.5,
+              'text-justify': 'auto'
+            },
+            paint: {
+              'text-color': mode === 'dark' ? '#aff' : '#000'
+            }
+          })
+        }
 
         // const hoveredStateId: number | null = null
 
@@ -237,7 +331,7 @@ const Map: FC<MapProps> = ({ data }) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const coordinates = (e?.features?.[0].geometry as any).coordinates.slice()
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const plainProperties = (e?.features?.[0].properties as any)
+          const plainProperties = e?.features?.[0].properties as any
 
           // // TODO: get from Minicard
           const component = MiniCard({
@@ -271,9 +365,10 @@ const Map: FC<MapProps> = ({ data }) => {
           if (!map.current) return
           map.current.getCanvas().style.cursor = ''
         })
+        // console.log(map.current)
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [poiData])
 
   return <div ref={mapContainer} id='map' style={{ width: '100%', height: '100%' }}></div>

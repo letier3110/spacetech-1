@@ -1,9 +1,18 @@
+export type CoordItem = [string, string]
+
+export type CoordObj = {
+  lt: string
+  lg: string
+}
+
 export interface DataEntry {
   originalIndex?: number
   address: string
   area: string
   latitude: string
   longitude: string
+  coordinates?: Array<Array<CoordObj>>
+  // coordinates?: Array<CoordItem>
   slope?: string
   effectiveness?: string
   // remove this, legacy
