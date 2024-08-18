@@ -13,7 +13,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Example function to calculate solar effectiveness with more factors
-def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0, azimuth=180, month=1, panel_age=0, temperature=20, shading_factor=1.0):
+def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, unit_area="га", area_slope=0, azimuth=180, month=1, panel_age=0, temperature=20, shading_factor=1.0):
     # Constants for the example
     BASE_IRRADIANCE = 100000  # in W/m^2, example constant value
     PANEL_EFFICIENCY = 0.18  # Example panel efficiency
@@ -52,17 +52,18 @@ def main():
     for item in json_data:
         try:
             address = item['address']
+            unit_area = item['unit_area']
             area = float(item['area'].replace(',', '.'))
             try:
-                latitude = float(item['coordinates'][0][0][0][0])
-                longitude = float(item['coordinates'][0][0][0][1])
+                latitude = float(item['coordinates'][0][0][1])
+                longitude = float(item['coordinates'][0][0][0])
             except ValueError:
                 logging.error(f"Invalid latitude or longitude for address: {address}")
                 continue
             
             logging.debug(f"Processing address: {address}, area: {area}, latitude: {latitude}, longitude: {longitude}")
 
-            effectiveness = calculate_solar_effectiveness_v2(latitude, longitude, area)
+            effectiveness = calculate_solar_effectiveness_v2(latitude, longitude, area, unit_area)
             item['effectiveness'] = effectiveness
             logging.debug(f"Calculated effectiveness: {effectiveness} for address: {address}")
         except Exception as e:

@@ -37,7 +37,10 @@ def main():
             data = fetch_parcel_history(parcel_id) # type: List[dict]
             logging.debug(f"Processing record for parcel ID {parcel_id}")
             result = {} # type: dict
-            result['coordinates'] = data['geometry']['coordinates']
+            result['coordinates'] = data['geometry']['coordinates'] # [[[[lon, lat]]]]
+            # unwrap one level of array
+            result['coordinates'] = result['coordinates'][0]
+
             result['type'] = data['geometry']['type']
             result['cadnum'] = data['cadnum']
             result['area'] = data['area']

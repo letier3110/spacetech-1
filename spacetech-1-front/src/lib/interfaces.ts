@@ -34,8 +34,9 @@ export interface CadastrEntry {
   cadnum: string
   area: string
   unit_area: string
-  address: string
-  coordinates: Array<Array<Array<Array<number>>>>
+  address: string | null
+  coordinates: Array<Array<Array<number>>>
+  effectiveness?: number
 
   // needed for rendering
   color?: string

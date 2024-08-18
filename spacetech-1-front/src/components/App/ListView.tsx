@@ -17,7 +17,7 @@ interface ListViewProps {
   cadastrData: Array<CadastrEntry>
 }
 
-export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
+export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) => {
   const [mapMode] = useState(true)
   const [searchLocation] = ('м. Славутич')
   const [lat, setLat] = useState(51.5310101)
@@ -31,48 +31,8 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
       shortName: shortName && shortName.length > 0 ? shortName : undefined
     }
   })
-  // .filter((card) => currentMode?.value.every((tag) => card.tags.includes(tag)))
-  // .filter((card) => {
-  //   if (filters.tags.length > 0) {
-  //     return filters.tags.every((tag) => card.tags.includes(tag))
-  //   }
-  //   return true
-  // })
-
-  // const maxTagItems = 3
-  // const unlimitedFilters = tagGroups
-  //   .filter((group) => group.values.some((tag) => tag.value.toLowerCase().includes(searchInFilters.toLowerCase())))
-  //   .map((group) => {
-  //     const tags = group.values.filter((tag) => tag.value.toLowerCase().includes(searchInFilters.toLowerCase()))
-  //     return {
-  //       groupName: group.groupName,
-  //       values: tags
-  //     }
-  //   })
-  //   .map((group) => {
-  //     const tags = group.values.filter((tag) => !filters.tags.includes(tag.value))
-  //     return {
-  //       groupName: group.groupName,
-  //       values: tags.length > maxTagItems ? tags.slice(0, maxTagItems) : tags
-  //     }
-  //   })
-  // const filteredTagItems = unlimitedFilters.filter((group) => group.values.length > 0)
-
-  // const ViewMode = (
-  //   <div className='ViewMode'>
-  //     <button className='ViewModeBtn outline' onClick={() => {}}>
-  //       {mapMode ? 'Map View' : 'Grid View'}
-  //     </button>
-  //   </div>
-  // )
 
   const sortedContent = filteredContent.sort((a, b) => {
-    // if (filters.sort === 'rating') {
-    //   return b.medianRating - a.medianRating
-    // }
-    // if (filters.sort === 'popularity') {
-    //   return b.numberOfRatings - a.numberOfRatings
-    // }
     if(a.effectiveness && b.effectiveness) {
       return Number.parseFloat(b.effectiveness ?? '0') - Number.parseFloat(a.effectiveness ?? '0')
     } else {
@@ -80,7 +40,8 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
     }
   });
 
-  const onlyWithEffectiveness = cardsData
+  const onlyWithEffectiveness = ((cardsData as unknown[] as Array<Record<string, string>>).concat(cadastrData as unknown[] as Array<Record<string, string>>))
+  // const onlyWithEffectiveness = cardsData
     .filter((x) => x?.effectiveness)
     .map((x) => Number.parseFloat(x.effectiveness ?? '0'))
   const min = Math.min(...onlyWithEffectiveness)
@@ -88,6 +49,14 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
 
   const mappedContent = sortedContent.map(x => {
     const newColor = generateColor(Number.parseFloat(x.effectiveness ?? '0'), min ?? 0, max ?? 1);
+    return {
+      ...x,
+      color: newColor
+    }
+  })
+
+  const mappedCadastrData = cadastrData.map(x => {
+    const newColor = generateColor(x.effectiveness ?? 0, min ?? 0, max ?? 1);
     return {
       ...x,
       color: newColor
@@ -121,7 +90,7 @@ export const ListView: FC<ListViewProps> = ({ data: cardsData }) => {
               />
             ))}
           </div>
-          <Map data={mappedContent} lat={lat} lng={lng} zoom={zoom} />
+          <Map data={mappedContent} cadastrData={mappedCadastrData} lat={lat} lng={lng} zoom={zoom} />
         </div>
       )}
       {/* <div className='bottom'></div> */}

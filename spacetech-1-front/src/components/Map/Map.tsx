@@ -2,7 +2,7 @@ import mapboxgl from 'mapbox-gl'
 import { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { renderToString } from 'react-dom/server'
 import ErrorBoundary from '../App/ErrorBoundary'
-import { DataEntry } from '../../lib/interfaces'
+import { CadastrEntry, DataEntry } from '../../lib/interfaces'
 import './mapbox.css'
 import MiniCard from './MiniCard'
 
@@ -18,16 +18,17 @@ const showPolygonExtrusion = false
 
 interface MapProps {
   data: Array<DataEntry>
+  cadastrData: Array<CadastrEntry>
   lat: number
   lng: number
   zoom: number
 }
 
-const MapWrapper: FC<MapProps> = ({ data, lat, lng, zoom }) => {
+const MapWrapper: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
   return (
     <div className='map-wrapper'>
       <ErrorBoundary fallback={'Cant Load Maps'}>
-        <Map data={data} lat={lat} lng={lng} zoom={zoom} />
+        <Map data={data} cadastrData={cadastrData} lat={lat} lng={lng} zoom={zoom} />
       </ErrorBoundary>
     </div>
   )
@@ -68,7 +69,7 @@ const initialPoiData: GeoJSON.GeoJSON = {
   ]
 }
 
-const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
+const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<mapboxgl.Map | null>(null)
   const prevData = useRef<Array<DataEntry>>([])
@@ -107,13 +108,10 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           const polygonCoords = (card.coordinates ?? [[]]).map((x) => {
             const coords = x.map((y) => {
               const coord = [Number.parseFloat(y.lg), Number.parseFloat(y.lt)]
-              // console.log(coord)
               return coord
             })
-            // console.log(coords)
             return coords
           })
-          // console.log(JSON.stringify(polygonCoords))
           const polygonGeomentry = {
             type: 'Polygon' as GeoJSON.Polygon['type'],
             coordinates: polygonCoords
@@ -129,12 +127,28 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
               icon: 'music'
             },
             geometry: isPolygon && polygonTernary ? polygonGeomentry : dotGeomentry
-            // geometry: dotGeomentry
+          }
+        })
+      ).concat(
+        cadastrData.map<GeoJSON.Feature>((card, index) => {
+          const polygonGeomentry = {
+            type: card.type as GeoJSON.Polygon['type'],
+            coordinates: card.coordinates
+          }
+          return {
+            type: 'Feature',
+            properties: {
+              ...card,
+              color: card.color,
+              originalIndex: index + data.length,
+              icon: 'music'
+            },
+            geometry: polygonGeomentry
           }
         })
       )
     }
-  }, [data])
+  }, [cadastrData, data])
   useEffect(() => {
     if (map.current) {
       // if map loaded && data changed
@@ -152,17 +166,11 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
       }
       return
     } // initialize map only once
-    // create map once, then "fly" to new locations
     map.current = new mapboxgl.Map({
       container: mapContainer.current as never, // container ID
-      // traffic v12
       style: `mapbox://styles/mapbox/${mode}-v11`, // style URL
-      // center: [-8.6291, 41.1579], // Porto coordinates
-      // zoom: 13,
       center: [lng, lat],
       zoom: zoom,
-      // pitch: 60,
-      // bearing: -60,
       dragRotate: false,
       touchZoomRotate: false,
       localFontFamily: 'Pangea Display,Helvetica,Arial,sans-serif'
@@ -170,9 +178,6 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
     if (map.current) {
       map.current.on('load', () => {
         if (!map.current) return
-        // const onlyWithEffectiveness = poiData.features.filter((x) => x.properties?.effectiveness)
-        // const min = Math.min(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
-        // const max = Math.max(...onlyWithEffectiveness.map((x) => x.properties?.effectiveness))
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
           if (!map.current) return
           const colorScheme = event.matches ? 'dark' : 'light'
@@ -196,6 +201,18 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           ...poiData,
           features: poiData.features.filter((x) => x.geometry.type === 'Polygon')
         }
+        const cadastrs = {
+          ...poiData,
+          features: poiData.features.filter((x) => x.geometry.type === 'MultiPolygon').map((x) => {
+            return {
+              ...x,
+              geometry: {
+                type: 'Polygon' as GeoJSON.Polygon['type'],
+                coordinates: x.geometry.type === 'MultiPolygon' ? x.geometry.coordinates : []
+              }
+            }
+          })
+        }
 
         prevData.current = data
         map.current.addSource('pois', {
@@ -206,6 +223,12 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           type: 'geojson',
           data: polygons
         })
+        map.current.addSource('cds', {
+          type: 'geojson',
+          data: cadastrs as unknown as GeoJSON.GeoJSON
+        })
+
+        console.log(points, polygons, cadastrs)
 
         if (showPoiText) {
           map.current.addLayer({
@@ -232,15 +255,6 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             paint: {
               'circle-radius': 6,
               'circle-color': ['get', 'color']
-              // 'circle-color': [
-              //   'interpolate',
-              //   ['linear'],
-              //   ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
-              //   min,
-              //   'red', // Minimum slope value, color red
-              //   max,
-              //   'green' // Maximum slope value, color green
-              // ]
             }
           })
         }
@@ -250,24 +264,20 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
             .addLayer({
               id: 'polygon-layer',
               source: 'pss',
-              // type: 'circle',
-              // paint: {
-              //   'circle-radius': 6,
-              //   'circle-color': ['get', 'color']
-              // }
               type: 'fill',
               layout: {},
               paint: {
                 'fill-color': ['get', 'color'],
-                // 'fill-color': [
-                //   'interpolate',
-                //   ['exponential', 0.01],
-                //   ['get', 'effectiveness'], // Access the 'effectiveness' property from your source
-                //   min,
-                //   'red', // Minimum slope value, color red
-                //   max,
-                //   'green' // Maximum slope value, color green
-                // ],
+                'fill-opacity': 0.765
+              }
+            })
+            .addLayer({
+              id: 'cadastr-layer',
+              source: 'cds',
+              type: 'fill',
+              layout: {},
+              paint: {
+                'fill-color': ['get', 'color'],
                 'fill-opacity': 0.765
               }
             })
@@ -307,6 +317,19 @@ const Map: FC<MapProps> = ({ data, lat, lng, zoom }) => {
           map.current.addLayer({
             id: 'polygon-layer-text',
             source: 'pss',
+            type: 'symbol',
+            layout: {
+              'text-field': ['get', 'originalIndex'],
+              'text-variable-anchor': ['top', 'bottom', 'left', 'right'],
+              'text-radial-offset': 0.5,
+              'text-justify': 'auto'
+            },
+            paint: {
+              'text-color': mode === 'dark' ? '#aff' : '#000'
+            }
+          }).addLayer({
+            id: 'cadastr-layer-text',
+            source: 'cds',
             type: 'symbol',
             layout: {
               'text-field': ['get', 'originalIndex'],
