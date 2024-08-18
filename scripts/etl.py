@@ -2,7 +2,8 @@
 # data is like this: 
 # 1. find line that starts with 'м.Славутич, '
 # 2. extract that line (=address) and line below it (=area)
-# 3. write to json file
+# 3. remove duplicates with address as key
+# 4. write to json file
 
 import json
 import logging
@@ -15,10 +16,15 @@ def extract_data(file_path):
     with open(file_path, 'r') as file:
         lines = file.readlines()
         data = []
+        address_set = set()
         for i, line in enumerate(lines):
             if line.startswith('м.Славутич, '):
                 logging.debug(f"Found address line: {line.strip()}")
                 address = line.strip()
+                if address in address_set:
+                    logging.debug(f"Address already processed, skipping")
+                    continue
+                address_set.add(address)
                 area = lines[i+1].strip()
                 logging.debug(f"Extracted area line: {area}")
                 data.append({

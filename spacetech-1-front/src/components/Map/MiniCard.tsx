@@ -10,7 +10,6 @@ interface MiniCardProps {
 const MiniCard: FC<MiniCardProps> = ({ cardData, index }) => {
   // const link = generateGmapsLink(cardData.address)
   const cardEffectiveness = cardData.effectiveness === undefined ? 0 : parseFloat(cardData.effectiveness)
-  console.log(cardData, cardEffectiveness)
   return (
     <div className='MiniCard'>
       {cardData.mediaUrl && cardData.mediaUrl.length > 0 && <img src={cardData.mediaUrl[0]} className='MiniCardBg' />}

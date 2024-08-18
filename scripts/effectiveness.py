@@ -26,7 +26,7 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
     irradiance = BASE_IRRADIANCE * seasonal_factor
 
     # Read json from `../data/configuration/installement_cost.json`
-    # get "name", "total_power", "number_of_panels", "min_roof_area", "warranty_period", "price", "income_per_year", "payback_period"
+    # get "effectiveness_weight, "name", "total_power", "number_of_panels", "min_roof_area", "warranty_period", "price", "income_per_year", "payback_period"
     # if area_sqm >= min_roof_area, add cost to formula and adjust effectiveness
     # if warranty_period < 10, add cost to formula and adjust effectiveness
     # if price > 10000, add cost to formula and adjust effectiveness
@@ -35,23 +35,18 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
     # if number_of_panels > 10, add cost to formula and adjust
 
     adjusted_cost = 0
+    incremental_step = 0.06
 
     with open('../data/configuration/installement_cost.json', 'r', encoding='utf-8') as f:
         json_data = json.load(f)
         logging.debug(f"Loaded JSON data: {json_data}")
-        if area_sqm >= json_data['min_roof_area']:
-            adjusted_cost += json_data['price']
-        if json_data['warranty_period'] < 10:
-            adjusted_cost += json_data['price']
-        if json_data['price'] > 10000:
-            adjusted_cost += json_data['price']
-        if json_data['income_per_year'] < 1000:
-            adjusted_cost += json_data['price']
-        if json_data['payback_period'] > 10:
-            adjusted_cost += json_data['price']
-        if json_data['number_of_panels'] > 10:
-            adjusted_cost += json_data['price']
-
+        # check if area_sqm >= min_roof_area in json_data array, then multiply by item index
+        for i, item in enumerate(json_data):
+            # area_sqm slice ',' and convert to float
+            # area = float(area_sqm.replace(',', '.'))
+            roof_area = float(item['min_roof_area'].replace(' м2', ''))
+            if (area_sqm) <= roof_area:
+                adjusted_cost = i * incremental_step
 
     # Adjust for orientation and slope
     orientation_factor = np.cos(np.radians(area_slope)) * np.cos(np.radians(azimuth - 180))
@@ -66,7 +61,8 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0
     collected_energy = irradiance * area_sqm * orientation_factor * PANEL_EFFICIENCY * temp_factor * degradation_factor * shading_factor * INVERTER_EFFICIENCY
 
     # Normalize effectiveness to a value between 0 and 1 (for example purposes)
-    effectiveness = collected_energy / (BASE_IRRADIANCE * area_sqm * PANEL_EFFICIENCY)
+    effectiveness = (collected_energy / (BASE_IRRADIANCE * area_sqm * PANEL_EFFICIENCY))
+    effectiveness = effectiveness - effectiveness * (incremental_step * len(json_data)) + (effectiveness * adjusted_cost)
 
     # effectiveness -= adjusted_cost
     
