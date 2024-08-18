@@ -4,6 +4,12 @@ It is possible to locate optimal zones for solar/wind relative profitability/sus
 
 We can use satalite data for to create model, that can both plan and forecast the following: determine most effective areas for solar or wind generation, is it safe to build there, what grids are exist in the area to integrate with.
 
+## What is inside this repo
+
+- `data` folder with [classified] information, ask contributors
+- `scripts` with ETL, parsers and estimators
+- frontend app in `spacetech-1-front`, as a solution to the problem
+
 ## Techical requirements
 
 To get unprecise, but somewhat honest cost of solar panel construction per sq m, effectiveness, operation cost and revenue - we can combine these layers:
