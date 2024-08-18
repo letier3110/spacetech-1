@@ -70,7 +70,7 @@
   display: grid;
   gap: 12px;
   grid-gap: 12px;
-  grid-template-columns: minmax(0px, 0px) 1fr;
+  grid-template-columns: minmax(250px, 390px) 1fr;
   max-height: calc(100vh - 200px - var(--app-padding-vertical) * 2);
   height: 100vh;
 }
