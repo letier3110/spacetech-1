@@ -1,10 +1,21 @@
+# read data from '../data/rich/2.json' and write to '../data/rich/3.json'
+# data is like this: [{ "address": string, "area": "701,30","latitude": string,"longitude": string,}]
+# 1. read each object properties from file
+# 2. calculate solar effectiveness with area, latitude, longitude
+# 3. write to json file
+
 import pandas as pd
 import numpy as np
+import json
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Example function to calculate solar effectiveness with more factors
-def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope, azimuth, month, panel_age, temperature, shading_factor=1.0):
+def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope=0, azimuth=180, month=1, panel_age=0, temperature=20, shading_factor=1.0):
     # Constants for the example
-    BASE_IRRADIANCE = 1000  # in W/m^2, example constant value
+    BASE_IRRADIANCE = 100000  # in W/m^2, example constant value
     PANEL_EFFICIENCY = 0.18  # Example panel efficiency
     INVERTER_EFFICIENCY = 0.95  # Example inverter efficiency
     TEMPERATURE_COEFFICIENT = -0.004  # Efficiency loss per degree above 25°C
@@ -31,15 +42,36 @@ def calculate_solar_effectiveness_v2(latitude, longitude, area_sqm, area_slope, 
     
     return max(0, min(1, effectiveness))  # Ensure effectiveness is between 0 and 1
 
-# Load the dataset
-df = pd.read_csv('solar_panels_data_extended.csv')
+def main():
+    # Read data from '../data/rich/2.json'
+    with open('../data/rich/2.json', 'r', encoding='utf-8') as f:
+        json_data = json.load(f)
+        logging.debug(f"Loaded JSON data: {json_data}")
 
-# Assume additional columns: 'month', 'panel_age', 'temperature', 'shading_factor'
-# Calculate effectiveness for each row
-df['effectiveness'] = df.apply(lambda row: calculate_solar_effectiveness_v2(
-    row['latitude'], row['longitude'], row['area_sqm'], row['area_slope'], row['azimuth'],
-    row['month'], row['panel_age'], row['temperature'], row['shading_factor']
-), axis=1)
+    # Process each object and calculate solar effectiveness
+    for item in json_data:
+        try:
+            address = item['address']
+            area = float(item['area'].replace(',', '.'))
+            try:
+                latitude = float(item['latitude'])
+                longitude = float(item['longitude'])
+            except ValueError:
+                logging.error(f"Invalid latitude or longitude for address: {address}")
+                continue
+            
+            logging.debug(f"Processing address: {address}, area: {area}, latitude: {latitude}, longitude: {longitude}")
 
-# Save the updated dataset
-df.to_csv('solar_panels_data_with_effectiveness_v2.csv', index=False)
+            effectiveness = calculate_solar_effectiveness_v2(latitude, longitude, area)
+            item['effectiveness'] = effectiveness
+            logging.debug(f"Calculated effectiveness: {effectiveness} for address: {address}")
+        except Exception as e:
+            logging.error(f"Error processing item: {item}, error: {e}")
+
+    # Write the updated JSON data to '../data/rich/3.json'
+    with open('../data/rich/3.json', 'w', encoding='utf-8') as f:
+        json.dump(json_data, f, ensure_ascii=False, indent=4)
+        logging.debug(f"Written updated JSON data to '../data/rich/3.json'")
+
+if __name__ == "__main__":
+    main()
