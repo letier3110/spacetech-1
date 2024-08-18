@@ -452,11 +452,10 @@ const Map: FC<MapProps> = ({ data, cadastrData, lat, lng, zoom }) => {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const plainProperties = e?.features?.[0].properties as any
 
-          // // TODO: get from Minicard
           const component = MiniCard({
             cardData: {
               // originalIndex: 0,
-              area: plainProperties.area,
+              area: plainProperties.unit_area === 'га' ? `${(Number.parseFloat(plainProperties.area) * 10000).toFixed(2)}` : `${plainProperties.area}`,
               mediaUrl: plainProperties.mediaUrl ? JSON.parse(plainProperties.mediaUrl) : undefined,
               effectiveness: plainProperties.effectiveness,
               address: plainProperties.address,
