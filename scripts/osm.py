@@ -74,6 +74,16 @@ def get_building_polygon(lat: float, lon: float) -> List[Polygon]:
     return polygons
 
 
+def polygon_to_coordinates_list(polygon):
+    # Extract the exterior coordinates of the polygon
+    exterior_coords = list(polygon.exterior.coords)
+
+    # Format the coordinates into the desired structure
+    formatted_coords = [{"lt": f"{lat:.5f}", "lg": f"{lon:.5f}"} for lon, lat in exterior_coords]
+
+    return formatted_coords
+
+
 def main():
     # Read data from '../data/rich/1.json'
     with open('../data/rich/1.json', 'r', encoding='utf-8') as f:
@@ -99,6 +109,7 @@ def main():
             polygons = get_building_polygon(float(lat), float(lon))
             if polygons:
                 item['polygons'] = [polygon.wkt for polygon in polygons]
+                item['coordinates'] = [polygon_to_coordinates_list(polygon) for polygon in polygons]
             else:
                 logging.debug("No building polygons found")
         else:
