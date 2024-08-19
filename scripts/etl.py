@@ -7,18 +7,19 @@
 
 import json
 import logging
+import sys
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-def extract_data(file_path):
+def extract_data(file_path, prefix='м.Славутич, '):
     logging.debug(f"Opening file for reading: {file_path}")
     with open(file_path, 'r') as file:
         lines = file.readlines()
         data = []
         address_set = set()
         for i, line in enumerate(lines):
-            if line.startswith('м.Славутич, '):
+            if line.startswith(prefix):
                 logging.debug(f"Found address line: {line.strip()}")
                 address = line.strip()
                 if address in address_set:
@@ -40,9 +41,10 @@ def write_data(data, file_path):
         json.dump(data, file, ensure_ascii=False, indent=4)
     logging.debug(f"Data written to file: {file_path}")
 
+# add arguments for prefix, get them from command line
 def main():
     logging.debug("Starting ETL process")
-    data = extract_data('../data/raw/1.ini')
+    data = extract_data('../data/raw/1.ini', prefix=sys.argv[1])
     write_data(data, '../data/rich/1.json')
     logging.debug("ETL process completed")
 
