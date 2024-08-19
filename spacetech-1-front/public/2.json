@@ -4,7 +4,7 @@
         "area": "120",
         "latitude": "49.6298787",
         "longitude": "23.943011381405924",
-        "effectiveness": 0.7072535552645155,
+        "effectiveness": "0.7072535552645155",
         "solar_kit": {
             "effectiveness_weight": 0.12,
             "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 20 КВТ",
@@ -84,7 +84,7 @@
             ]
         ],
         "polygons_area": 304.2000645655737,
-        "effectiveness": 0.7155437083277979,
+        "effectiveness": "0.7155437083277979",
         "solar_kit": {
             "effectiveness_weight": 0.18,
             "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 30 КВТ",
@@ -160,7 +160,7 @@
             ]
         ],
         "polygons_area": 349.78489945372417,
-        "effectiveness": 0.7155389739308353,
+        "effectiveness": "0.7155389739308353",
         "solar_kit": {
             "effectiveness_weight": 0.18,
             "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 30 КВТ",
@@ -224,7 +224,7 @@
             ]
         ],
         "polygons_area": 276.5891677441879,
-        "effectiveness": 0.7155249821351255,
+        "effectiveness": "0.7155249821351255",
         "solar_kit": {
             "effectiveness_weight": 0.18,
             "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 30 КВТ",
@@ -288,7 +288,7 @@
             ]
         ],
         "polygons_area": 273.99262392054607,
-        "effectiveness": 0.7155231914647925,
+        "effectiveness": "0.7155231914647925",
         "solar_kit": {
             "effectiveness_weight": 0.18,
             "name": "КОМПЛЕКТ СОНЯЧНОЇ ЕЛЕКТРОСТАНЦІЇ 30 КВТ",
