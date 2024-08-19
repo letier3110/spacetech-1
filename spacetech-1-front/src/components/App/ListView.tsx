@@ -21,8 +21,8 @@ interface ListViewProps {
 export const ListView: FC<ListViewProps> = ({ data: cardsData, cadastrData }) => {
   const [mapMode] = useState(true)
   const [searchLocation] = 'м. Славутич'
-  const [lat, setLat] = useState(51.5310101)
-  const [lng, setLng] = useState(30.7383043)
+  const [lat, setLat] = useState(cardsData[0].latitude ? Number.parseFloat(cardsData[0].latitude) : 51.5176)
+  const [lng, setLng] = useState(cardsData[0].longitude ? Number.parseFloat(cardsData[0].longitude) : 30.7464)
   const [zoom, setZoom] = useState(13)
 
   const filteredContent = cardsData.map((card) => {
